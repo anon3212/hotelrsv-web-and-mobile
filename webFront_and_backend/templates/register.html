@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="row justify-content-center align-items-center" style="min-height: 80vh;">
+    <div class="col-md-6 col-lg-5">
+        <div class="card border-0 shadow-lg rounded-4 p-4 p-md-5 bg-white">
+            <div class="text-center mb-4">
+                <img src="https://i.postimg.cc/rm9tk8s2/Chat-GPT-Image-Apr-22-2026-01-33-36-AM-Photoroom.png" 
+                     width="70" alt="BookInn Logo" class="mb-3">
+                <h3 class="fw-bold">Create an Account</h3>
+                <p class="text-muted small">Join BookInn to start booking your stay instantly.</p>
+            </div>
+
+            <form method="POST">
+                {% csrf_token %}
+                
+                {% if form.errors %}
+                <div class="alert alert-danger py-2 small rounded-3">
+                    <ul class="mb-0">
+                    {% for field in form %}
+                        {% for error in field.errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    {% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
+
+                <div class="mb-3">
+                    <label class="form-label small fw-bold text-muted">Username</label>
+                    <input type="text" name="username" class="form-control form-control-lg border-light-subtle rounded-3 fs-6" placeholder="Choose a username" required>
+                    <div class="form-text text-muted" style="font-size: 0.75rem;">Letters, digits and @/./+/-/_ only.</div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label small fw-bold text-muted">Password</label>
+                    <input type="password" name="password" class="form-control form-control-lg border-light-subtle rounded-3 fs-6" placeholder="Create a strong password" required>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label small fw-bold text-muted">Confirm Password</label>
+                    <input type="password" name="password_confirm" class="form-control form-control-lg border-light-subtle rounded-3 fs-6" placeholder="Repeat your password" required>
+                </div>
+
+                <button type="submit" class="btn btn-dark w-100 rounded-pill py-3 fw-bold shadow-sm mb-3">
+                    Sign Up
+                </button>
+            </form>
+
+            <div class="text-center mt-2">
+                <p class="small text-muted">
+                    Already have an account? 
+                    <a href="{% url 'login' %}" >Login here</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

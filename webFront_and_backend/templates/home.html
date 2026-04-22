@@ -1,0 +1,154 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<style>
+    /* 1. HERO SPACING */
+    .hero-section { padding-top: 120px; }
+
+    /* 2. SELECT VISIBILITY */
+    select.form-select, 
+    select.form-select option {
+        color: #212529 !important; 
+        background-color: #ffffff !important;
+        -webkit-text-fill-color: #212529 !important;
+    }
+
+    .filter-btn { margin-right: 8px; margin-bottom: 15px; transition: 0.3s; }
+    .filter-btn:hover { transform: translateY(-2px); }
+
+    /* 3. ROOM CARD STYLING */
+    .room-card { 
+        transition: transform 0.3s ease, shadow 0.3s ease;
+        border-radius: 20px;
+        overflow: hidden;
+        background: #1a1a1a;
+        border: 1px solid #333;
+    }
+    .room-card:hover { 
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.5) !important;
+    }
+    .room-img { height: 220px; object-fit: cover; width: 100%; }
+    .price-tag { font-size: 1.4rem; color: #fff; font-weight: bold; }
+</style>
+
+<div class="container">
+    <div class="hero-section">
+        <div class="mb-4">
+            <h2 class="fw-bold text-white">Find your perfect room</h2>
+            <p class="text-white-50">Browse available rooms and book instantly.</p>
+        </div>
+
+        <div class="card border-0 shadow-lg p-3 mb-5 rounded-4 bg-white">
+            <form method="GET" action="{% url 'home' %}">
+                <div class="row g-2 align-items-center">
+                    <div class="col-md-3">
+                        <label class="small text-muted d-block ms-1">Check-in</label>
+                        <div class="d-flex align-items-center bg-light rounded-3 px-2">
+                            <i class="bi bi-calendar-event text-primary me-2"></i>
+                            <input type="text" name="checkin" id="checkin" class="form-control border-0 bg-transparent p-2 fw-bold datepicker" placeholder="Select Date">
+                        </div>
+                    </div>
+                    <div class="col-md-3 border-md-start ps-md-3">
+                        <label class="small text-muted d-block ms-1">Check-out</label>
+                        <div class="d-flex align-items-center bg-light rounded-3 px-2">
+                            <i class="bi bi-calendar-check text-primary me-2"></i>
+                            <input type="text" name="checkout" id="checkout" class="form-control border-0 bg-transparent p-2 fw-bold datepicker" placeholder="Select Date">
+                        </div>
+                    </div>
+                    <div class="col-md-3 border-md-start ps-md-3">
+                        <label class="small text-muted d-block ms-1">Room type</label>
+                        <div class="d-flex align-items-center bg-light rounded-3 px-2">
+                            <i class="bi bi-house text-primary me-2"></i>
+                            <select name="room_type" class="form-select border-0 bg-light p-2 fw-bold shadow-none">
+                                <option value="Any">Any</option>
+                                <option value="Standard">Standard</option>
+                                <option value="Deluxe">Deluxe</option>
+                                <option value="Suite">Suite</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-3 text-end">
+                        <button type="submit" class="btn btn-dark px-4 rounded-pill w-100 py-2">Search Rooms</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <div class="mb-4">
+            <button class="btn btn-outline-light rounded-pill filter-btn" data-type="all">All</button>
+            <button class="btn btn-outline-light rounded-pill filter-btn" data-type="Standard">Standard</button>
+            <button class="btn btn-outline-light rounded-pill filter-btn" data-type="Deluxe">Deluxe</button>
+            <button class="btn btn-outline-light rounded-pill filter-btn" data-type="Suite">Suite</button>
+        </div>
+
+        <div class="row g-4 mb-5" id="room-grid">
+            {% for room in rooms %}
+            <div class="col-md-4 room-card-wrapper" data-room-type="{{ room.room_type }}">
+                <div class="card room-card h-100 shadow-sm">
+                    {% if room.image %}
+                        <img src="{{ room.image.url }}" class="room-img" alt="{{ room.room_type }}">
+                    {% else %}
+                        <div class="room-img bg-secondary d-flex align-items-center justify-content-center text-white">No Image</div>
+                    {% endif %}
+                    
+                    <div class="card-body text-white p-4">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <h4 class="fw-bold mb-0">{{ room.room_type }}</h4>
+                            <span class="badge {% if room.status == 'Available' %}bg-success text-dark{% else %}bg-danger{% endif %} rounded-pill">
+                                {{ room.status }}
+                            </span>
+                        </div>
+                        <p class="text-white-50 small mb-3">Room #{{ room.room_number }}</p>
+                        <div class="d-flex justify-content-between align-items-center mt-auto">
+                            <div class="price-tag">₱{{ room.price }} <span class="fs-6 text-muted fw-normal">/ night</span></div>
+                            <a href="{% url 'book_room' room.id %}" class="btn btn-primary rounded-pill px-4">Book</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12 text-center py-5">
+                <h4 class="text-white-50">No rooms found matching your criteria.</h4>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Flatpickr Setup
+        const fp_checkin = flatpickr("#checkin", {
+            minDate: "today",
+            altInput: true,
+            altFormat: "F j, Y",
+            dateFormat: "Y-m-d",
+            onChange: function(dates, str) { fp_checkout.set("minDate", str); }
+        });
+
+        const fp_checkout = flatpickr("#checkout", {
+            minDate: "today",
+            altInput: true,
+            altFormat: "F j, Y",
+            dateFormat: "Y-m-d",
+        });
+
+        // Filter button logic - Updated to work with the new Grid
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const type = btn.getAttribute('data-type');
+                
+                // Highlight active button
+                document.querySelectorAll('.filter-btn').forEach(b => b.classList.replace('btn-light', 'btn-outline-light'));
+                btn.classList.replace('btn-outline-light', 'btn-light');
+
+                document.querySelectorAll('.room-card-wrapper').forEach(card => {
+                    card.style.display = (type === 'all' || card.dataset.roomType === type) ? 'block' : 'none';
+                });
+            });
+        });
+    });
+</script>
+{% endblock %}
