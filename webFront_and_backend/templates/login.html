@@ -1,60 +1,145 @@
 {% extends 'base.html' %}
+{% load static %}
+
 {% block content %}
-<div class="row justify-content-center align-items-center" style="min-height: 80vh;">
-    <div class="col-md-5">
-        {% if messages %}
-            {% for message in messages %}
-                <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible fade show rounded-4 shadow-sm mb-4" role="alert">
-                    {{ message }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+<style>
+    /* Modern Deep Teal Background & Hero */
+    body { 
+        background-color: #0F1F24; /* Deep Charcoal-Teal */
+        color: #e0e0e0;
+        margin: 0;
+        padding: 0;
+    }
+
+    /* Fixed background image with teal overlay */
+    .login-wrapper {
+        position: relative;
+        min-height: 100vh;
+        z-index: 1;
+        display: flex;
+        align-items: center;
+    }
+
+    .login-wrapper::before {
+        content: "";
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        /* Using a gradient overlay to ensure readability against a background image */
+        background: linear-gradient(rgba(15, 31, 36, 0.8), rgba(15, 31, 36, 0.8)), 
+                    url('{% static "images/bookinn_bg.jpg" %}'); 
+        background-size: cover;
+        background-position: center;
+        z-index: -1;
+    }
+
+    /* Modern Deep Teal Card Styling */
+    .login-card {
+        background-color: #1A2A2F !important; /* Dark Slate */
+        border: 1px solid #2A3A3F !important;
+        border-radius: 24px;
+        backdrop-filter: blur(10px);
+        box-shadow: 0 15px 35px rgba(0,0,0,0.4) !important;
+    }
+
+    .form-control-custom {
+        background-color: #243439 !important;
+        border: 1px solid #344449 !important;
+        color: #ffffff !important;
+        transition: 0.3s;
+    }
+
+    .form-control-custom:focus {
+        border-color: #14B8A6 !important;
+        box-shadow: 0 0 0 0.25rem rgba(20, 184, 166, 0.25);
+    }
+
+    .form-control-custom::placeholder {
+        color: #6a7a7f !important;
+    }
+
+    /* Teal Action Components */
+    .btn-teal {
+        background-color: #14B8A6;
+        border-color: #14B8A6;
+        color: #0F1F24;
+        transition: 0.3s;
+    }
+
+    .btn-teal:hover {
+        background-color: #0D9488;
+        border-color: #0D9488;
+        color: #ffffff;
+        transform: translateY(-2px);
+    }
+
+    .text-teal { color: #14B8A6 !important; }
+    .text-teal:hover { color: #0D9488 !important; }
+    
+    .text-muted-custom { color: #94a3a8 !important; }
+</style>
+
+<div class="container login-wrapper">
+    <!-- justify-content-end moves the column to the right side -->
+    <div class="row w-100 justify-content-end">
+        <div class="col-md-5 col-lg-4 me-lg-5">
+            
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible fade show rounded-4 shadow-sm mb-4" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            <div class="card login-card p-4 p-md-5">
+                <div class="text-center mb-4">
+                    <img src="{% static 'images/logo.jpg' %}" 
+                         width="70" alt="BookInn Logo" class="mb-3">
+                    <h3 class="fw-bold text-white">Welcome back</h3>
+                    <p class="text-muted-custom small">Login to manage your BookInn reservations</p>
                 </div>
-            {% endfor %}
-        {% endif %}
 
-        <div class="card border-0 shadow-lg rounded-4 p-4 p-md-5 bg-white">
-            <div class="text-center mb-4">
-                <img src="https://i.postimg.cc/rm9tk8s2/Chat-GPT-Image-Apr-22-2026-01-33-36-AM-Photoroom.png" 
-                     width="70" alt="BookInn Logo" class="mb-3">
-                <h3 class="fw-bold text-dark">Welcome back</h3>
-                <p class="text-muted small">Login to manage your BookInn reservations</p>
-            </div>
+                <form method="POST">
+                    {% csrf_token %}
+                    
+                    {% if form.errors %}
+                    <div class="alert alert-danger py-2 small rounded-3 bg-danger bg-opacity-25 border-danger text-white">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                        Invalid username or password.
+                    </div>
+                    {% endif %}
 
-            <form method="POST">
-                {% csrf_token %}
-                
-                {% if form.errors %}
-                <div class="alert alert-danger py-2 small rounded-3">
-                    <i class="bi bi-exclamation-triangle-fill me-2"></i>
-                    Invalid username or password.
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-muted-custom">Username</label>
+                        <input type="text" name="username" 
+                               class="form-control form-control-lg form-control-custom rounded-3 fs-6" 
+                               placeholder="Enter your username" 
+                               required autocomplete="username">
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label small fw-bold text-muted-custom">Password</label>
+                        <input type="password" name="password" 
+                               class="form-control form-control-lg form-control-custom rounded-3 fs-6" 
+                               placeholder="Password" 
+                               required autocomplete="current-password">
+                    </div>
+
+                    <button type="submit" class="btn btn-teal w-100 rounded-pill py-3 fw-bold shadow-sm mb-3">
+                        Login
+                    </button>
+                </form>
+
+                <div class="text-center mt-2">
+                    <p class="small text-muted-custom">
+                        Don't have an account? 
+                        <a href="{% url 'register' %}" class="text-teal text-decoration-none fw-bold">Register here</a>
+                    </p>
                 </div>
-                {% endif %}
-
-                <div class="mb-3">
-                    <label class="form-label small fw-bold text-muted">Username</label>
-                    <input type="text" name="username" 
-                           class="form-control form-control-lg border-light-subtle rounded-3 fs-6" 
-                           placeholder="Enter your username" 
-                           required autocomplete="username">
-                </div>
-
-                <div class="mb-4">
-                    <label class="form-label small fw-bold text-muted">Password</label>
-                    <input type="password" name="password" 
-                           class="form-control form-control-lg border-light-subtle rounded-3 fs-6" 
-                           placeholder="Password" 
-                           required autocomplete="current-password">
-                </div>
-
-                <button type="submit" class="btn btn-dark w-100 rounded-pill py-3 fw-bold shadow-sm mb-3">
-                    Login
-                </button>
-            </form>
-
-            <div class="text-center mt-2">
-                <p class="text-dark small text-muted">
-                    Don't have an account? 
-                    <a href="{% url 'register' %}" >Register here</a>
-                </p>
             </div>
         </div>
     </div>

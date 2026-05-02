@@ -9,6 +9,9 @@ from django.utils import timezone
 from django.http import JsonResponse
 
 # --- WEB VIEWS ---
+def landing_page(request):
+    # This renders the new landing page template
+    return render(request, 'landing.html')
 
 def home(request):
     rooms = Room.objects.all()

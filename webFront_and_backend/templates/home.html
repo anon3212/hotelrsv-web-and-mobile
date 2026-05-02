@@ -3,114 +3,171 @@
 
 {% block content %}
 <style>
-    /* 1. HERO SPACING */
-    .hero-section { padding-top: 120px; }
-
-    /* 2. SELECT VISIBILITY */
-    select.form-select, 
-    select.form-select option {
-        color: #212529 !important; 
-        background-color: #ffffff !important;
-        -webkit-text-fill-color: #212529 !important;
+    /* 1. LAYOUT & BREAKOUT */
+    .breakout-container {
+        width: 100vw;
+        position: relative;
+        left: 50%;
+        right: 50%;
+        margin-left: -50vw;
+        margin-right: -50vw;
+        padding: 0 5%; /* 5% padding matches common dashboard layouts */
     }
 
-    .filter-btn { margin-right: 8px; margin-bottom: 15px; transition: 0.3s; }
-    .filter-btn:hover { transform: translateY(-2px); }
+    .hero-section {
+        position: relative;
+        padding-top: 100px;
+        z-index: 1;
+    }
 
-    /* 3. ROOM CARD STYLING */
+    /* 2. SEARCH & FILTERS */
+    .search-container-card {
+        background: rgba(26, 42, 47, 0.7) !important; 
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        backdrop-filter: blur(15px);
+        border-radius: 15px;
+    }
+    
+    .bg-custom-input { background-color: rgba(255, 255, 255, 0.05) !important; border: 1px solid rgba(255, 255, 255, 0.1) !important; }
+    .text-teal-bright { color: #14B8A6 !important; }
+
+    /* 3. FLEX GRID - THE "EVEN BOXES" LOGIC */
+    .room-flex-grid {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 24px; /* Space between cards */
+        align-items: stretch; /* Forces all cards in a row to be the same height */
+    }
+
+    .room-card-wrapper {
+        flex: 1 1 300px; /* Grow to fill, base at 300px */
+        display: flex; /* Necessary to make the card inside fill the wrapper height */
+    }
+
     .room-card { 
-        transition: transform 0.3s ease, shadow 0.3s ease;
+        width: 100%;
+        display: flex;
+        flex-direction: column; /* Stacks image, body, and footer vertically */
         border-radius: 20px;
         overflow: hidden;
-        background: #1a1a1a;
-        border: 1px solid #333;
+        background: rgba(22, 38, 43, 0.8); 
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        transition: 0.3s ease;
     }
+
     .room-card:hover { 
-        transform: translateY(-5px);
-        box-shadow: 0 10px 20px rgba(0,0,0,0.5) !important;
+        transform: translateY(-8px);
+        border-color: #14B8A6;
     }
-    .room-img { height: 220px; object-fit: cover; width: 100%; }
-    .price-tag { font-size: 1.4rem; color: #fff; font-weight: bold; }
+
+    /* Uniform Image Height */
+    .room-img-container {
+        height: 220px;
+        width: 100%;
+        overflow: hidden;
+    }
+
+    .room-img { 
+        height: 100%; 
+        width: 100%; 
+        object-fit: cover; 
+    }
+
+    /* Card Body Logic */
+    .card-body {
+        padding: 1.5rem;
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1; /* Pushes the price/button to the bottom */
+    }
+
+    .room-description {
+        display: -webkit-box;
+        -webkit-line-clamp: 2; /* Limits text to 2 lines for uniformity */
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        margin-bottom: 1rem;
+        font-size: 0.9rem;
+    }
+
+    .btn-teal { background-color: #14B8A6; color: #0F1F24; font-weight: 700; border: none; }
+    .btn-teal:hover { background-color: #0D9488; color: white; }
 </style>
 
-<div class="container">
+<div class="breakout-container">
     <div class="hero-section">
-        <div class="mb-4">
-            <h2 class="fw-bold text-white">Find your perfect room</h2>
+        
+        <div class="mb-4" data-aos="fade-right">
+            <h1 class="display-5 fw-bold text-white">Find your perfect room</h1>
             <p class="text-white-50">Browse available rooms and book instantly.</p>
         </div>
 
-        <div class="card border-0 shadow-lg p-3 mb-5 rounded-4 bg-white">
+        <!-- SEARCH BAR -->
+        <div class="card search-container-card p-4 mb-5 shadow-lg">
             <form method="GET" action="{% url 'home' %}">
-                <div class="row g-2 align-items-center">
-                    <div class="col-md-3">
-                        <label class="small text-muted d-block ms-1">Check-in</label>
-                        <div class="d-flex align-items-center bg-light rounded-3 px-2">
-                            <i class="bi bi-calendar-event text-primary me-2"></i>
-                            <input type="text" name="checkin" id="checkin" class="form-control border-0 bg-transparent p-2 fw-bold datepicker" placeholder="Select Date">
+                <div class="row g-3 align-items-end">
+                    <div class="col-lg-3 col-md-6">
+                        <label class="small text-white-50 mb-2 ms-1">Check-in</label>
+                        <div class="d-flex align-items-center bg-custom-input rounded-3 px-3">
+                            <i class="bi bi-calendar-event text-teal-bright me-2"></i>
+                            <input type="text" name="checkin" id="checkin" class="form-control border-0 bg-transparent py-2 text-white" placeholder="Select Date">
                         </div>
                     </div>
-                    <div class="col-md-3 border-md-start ps-md-3">
-                        <label class="small text-muted d-block ms-1">Check-out</label>
-                        <div class="d-flex align-items-center bg-light rounded-3 px-2">
-                            <i class="bi bi-calendar-check text-primary me-2"></i>
-                            <input type="text" name="checkout" id="checkout" class="form-control border-0 bg-transparent p-2 fw-bold datepicker" placeholder="Select Date">
+                    <div class="col-lg-3 col-md-6">
+                        <label class="small text-white-50 mb-2 ms-1">Check-out</label>
+                        <div class="d-flex align-items-center bg-custom-input rounded-3 px-3">
+                            <i class="bi bi-calendar-check text-teal-bright me-2"></i>
+                            <input type="text" name="checkout" id="checkout" class="form-control border-0 bg-transparent py-2 text-white" placeholder="Select Date">
                         </div>
                     </div>
-                    <div class="col-md-3 border-md-start ps-md-3">
-                        <label class="small text-muted d-block ms-1">Room type</label>
-                        <div class="d-flex align-items-center bg-light rounded-3 px-2">
-                            <i class="bi bi-house text-primary me-2"></i>
-                            <select name="room_type" class="form-select border-0 bg-light p-2 fw-bold shadow-none">
-                                <option value="Any">Any</option>
+                    <div class="col-lg-3 col-md-6">
+                        <label class="small text-white-50 mb-2 ms-1">Room type</label>
+                        <div class="d-flex align-items-center bg-custom-input rounded-3 px-3">
+                            <i class="bi bi-house text-teal-bright me-2"></i>
+                            <select name="room_type" class="form-select border-0 bg-transparent py-2 text-white">
+                                <option value="Any">Any Room Type</option>
                                 <option value="Standard">Standard</option>
                                 <option value="Deluxe">Deluxe</option>
                                 <option value="Suite">Suite</option>
                             </select>
                         </div>
                     </div>
-                    <div class="col-md-3 text-end">
-                        <button type="submit" class="btn btn-dark px-4 rounded-pill w-100 py-2">Search Rooms</button>
+                    <div class="col-lg-3 col-md-6">
+                        <button type="submit" class="btn btn-teal btn-lg w-100 rounded-pill">Search Rooms</button>
                     </div>
                 </div>
             </form>
         </div>
 
-        <div class="mb-4">
-            <button class="btn btn-outline-light rounded-pill filter-btn" data-type="all">All</button>
-            <button class="btn btn-outline-light rounded-pill filter-btn" data-type="Standard">Standard</button>
-            <button class="btn btn-outline-light rounded-pill filter-btn" data-type="Deluxe">Deluxe</button>
-            <button class="btn btn-outline-light rounded-pill filter-btn" data-type="Suite">Suite</button>
-        </div>
-
-        <div class="row g-4 mb-5" id="room-grid">
+        <!-- THE UNIFORM GRID -->
+        <div class="room-flex-grid pb-5" id="room-grid">
             {% for room in rooms %}
-            <div class="col-md-4 room-card-wrapper" data-room-type="{{ room.room_type }}">
-                <div class="card room-card h-100 shadow-sm">
-                    {% if room.image %}
-                        <img src="{{ room.image.url }}" class="room-img" alt="{{ room.room_type }}">
-                    {% else %}
-                        <div class="room-img bg-secondary d-flex align-items-center justify-content-center text-white">No Image</div>
-                    {% endif %}
+            <div class="room-card-wrapper" data-room-type="{{ room.room_type }}">
+                <div class="room-card">
+                    <div class="room-img-container">
+                        {% if room.image %}
+                            <img src="{{ room.image.url }}" class="room-img" alt="{{ room.room_type }}">
+                        {% else %}
+                            <div class="room-img bg-secondary d-flex align-items-center justify-content-center">No Image</div>
+                        {% endif %}
+                    </div>
                     
-                    <div class="card-body text-white p-4">
+                    <div class="card-body text-white">
                         <div class="d-flex justify-content-between align-items-center mb-2">
                             <h4 class="fw-bold mb-0">{{ room.room_type }}</h4>
-                            <span class="badge {% if room.status == 'Available' %}bg-success text-dark{% else %}bg-danger{% endif %} rounded-pill">
+                            <span class="badge {% if room.status == 'Available' %}bg-success{% else %}bg-danger{% endif %} rounded-pill px-3 py-1 small">
                                 {{ room.status }}
                             </span>
                         </div>
-                        <p class="text-white-50 small mb-3">Room #{{ room.room_number }}</p>
-                        <div class="d-flex justify-content-between align-items-center mt-auto">
-                            <div class="price-tag">₱{{ room.price }} <span class="fs-6 text-muted fw-normal">/ night</span></div>
-                            <a href="{% url 'book_room' room.id %}" class="btn btn-primary rounded-pill px-4">Book</a>
+                        <p class="text-white-50 small">Room #{{ room.room_number }}</p>
+                        
+                        <!-- Pushes footer to the bottom -->
+                        <div class="mt-auto pt-3 d-flex justify-content-between align-items-center border-top border-secondary border-opacity-25">
+                            <div class="h4 fw-bold mb-0">₱{{ room.price }} <span class="fs-6 text-white-50 fw-normal">/ night</span></div>
+                            <a href="{% url 'book_room' room.id %}" class="btn btn-teal rounded-pill px-4">Book</a>
                         </div>
                     </div>
                 </div>
-            </div>
-            {% empty %}
-            <div class="col-12 text-center py-5">
-                <h4 class="text-white-50">No rooms found matching your criteria.</h4>
             </div>
             {% endfor %}
         </div>
@@ -119,36 +176,8 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Flatpickr Setup
-        const fp_checkin = flatpickr("#checkin", {
-            minDate: "today",
-            altInput: true,
-            altFormat: "F j, Y",
-            dateFormat: "Y-m-d",
-            onChange: function(dates, str) { fp_checkout.set("minDate", str); }
-        });
-
-        const fp_checkout = flatpickr("#checkout", {
-            minDate: "today",
-            altInput: true,
-            altFormat: "F j, Y",
-            dateFormat: "Y-m-d",
-        });
-
-        // Filter button logic - Updated to work with the new Grid
-        document.querySelectorAll('.filter-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const type = btn.getAttribute('data-type');
-                
-                // Highlight active button
-                document.querySelectorAll('.filter-btn').forEach(b => b.classList.replace('btn-light', 'btn-outline-light'));
-                btn.classList.replace('btn-outline-light', 'btn-light');
-
-                document.querySelectorAll('.room-card-wrapper').forEach(card => {
-                    card.style.display = (type === 'all' || card.dataset.roomType === type) ? 'block' : 'none';
-                });
-            });
-        });
+        flatpickr("#checkin", { minDate: "today", dateFormat: "Y-m-d" });
+        flatpickr("#checkout", { minDate: "today", dateFormat: "Y-m-d" });
     });
 </script>
 {% endblock %}
