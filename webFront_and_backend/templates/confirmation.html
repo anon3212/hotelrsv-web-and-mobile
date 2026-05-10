@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<style>
+    .confirmation-card {
+        background: rgba(22, 38, 43, 0.9);
+        backdrop-filter: blur(15px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 20px;
+        max-width: 700px;
+        margin: 80px auto;
+        padding: 3rem;
+    }
+    .status-badge-pending {
+        background: rgba(255, 193, 7, 0.2);
+        color: #ffc107;
+        padding: 8px 20px;
+        border-radius: 50px;
+        font-weight: 600;
+        display: inline-block;
+    }
+    .info-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+        text-align: left;
+    }
+    .info-item label {
+        display: block;
+        color: rgba(255, 255, 255, 0.5);
+        font-size: 0.85rem;
+        margin-bottom: 5px;
+    }
+    .info-item span {
+        color: white;
+        font-weight: 600;
+    }
+    .btn-outline-teal {
+        border: 2px solid #14B8A6;
+        color: #14B8A6;
+        transition: 0.3s;
+    }
+    .btn-outline-teal:hover {
+        background: #14B8A6;
+        color: #0F1F24;
+    }
+</style>
+
+<div class="container text-center">
+    <div class="confirmation-card shadow-lg">
+        <!-- Success Icon -->
+        <div class="mb-4">
+            <i class="bi bi-clock-history text-warning" style="font-size: 4rem;"></i>
+        </div>
+
+        <h2 class="fw-bold text-white mb-2">Booking Received!</h2>
+        <div class="status-badge-pending mb-4">
+            <i class="bi bi-hourglass-split me-2"></i> Payment Under Review
+        </div>
+
+        <p class="text-white-50 mb-5">
+            Thank you, <strong>{{ reservation.guest_name }}</strong>! We've received your GCash receipt. 
+            Our team is currently verifying the transaction. You will receive a notification once your 
+            booking is officially <strong>Confirmed</strong>.
+        </p>
+
+        <!-- Booking Details Summary -->
+        <div class="info-grid p-4 rounded mb-5" style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05);">
+            <div class="info-item">
+                <label>Booking ID</label>
+                <span>{{ reservation.booking_id }}</span>
+            </div>
+            <div class="info-item">
+                <label>Room</label>
+                <span>{{ reservation.room.name }}</span>
+            </div>
+            <div class="info-item">
+                <label>Check-in</label>
+                <span>{{ reservation.check_in }}</span>
+            </div>
+            <div class="info-item">
+                <label>Check-out</label>
+                <span>{{ reservation.check_out }}</span>
+            </div>
+            <div class="info-item">
+                <label>Total Paid</label>
+                <span class="text-warning">₱{{ reservation.room.price }}</span>
+            </div>
+            <div class="info-item">
+                <label>GCash Ref No.</label>
+                <span>{{ reservation.payment_reference|default:"Not Provided" }}</span>
+            </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="d-flex flex-column flex-md-row gap-3 justify-content-center">
+            <a href="{% url 'profile' %}" class="btn btn-teal px-5 py-3 rounded-pill">
+                View My Bookings
+            </a>
+            <a href="{% url 'home' %}" class="btn btn-outline-teal px-5 py-3 rounded-pill">
+                Back to Home
+            </a>
+        </div>
+        
+        <p class="mt-5 small text-white-50">
+            Need help? Contact support at 0926 967 3682 or bookinn@gmail.com
+        </p>
+    </div>
+</div>
+{% endblock %}

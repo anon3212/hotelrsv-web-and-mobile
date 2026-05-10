@@ -89,13 +89,12 @@
 </style>
 
 <div class="container register-wrapper">
-    <!-- justify-content-end moves the card to the right side -->
     <div class="row w-100 justify-content-end">
         <div class="col-md-6 col-lg-5 col-xl-4 me-lg-5">
             
             <div class="card register-card p-4 p-md-5">
                 <div class="text-center mb-4">
-                    <img src="https://i.postimg.cc/rm9tk8s2/Chat-GPT-Image-Apr-22-2026-01-33-36-AM-Photoroom.png" 
+                    <img src="{% static 'images/logo.jpg' %}" 
                          width="70" alt="BookInn Logo" class="mb-3">
                     <h3 class="fw-bold text-white">Create an Account</h3>
                     <p class="text-muted-custom small">Join BookInn to start booking your stay instantly.</p>
@@ -104,10 +103,15 @@
                 <form method="POST">
                     {% csrf_token %}
                     
-                    {# 1. Check for General Errors #}
-                    {% if form.non_field_errors %}
+                    {# 1. Error Handling Block #}
+                    {% if form.errors %}
                     <div class="alert alert-custom py-2 small rounded-3 mb-3">
                         <ul class="mb-0">
+                            {% for field in form %}
+                                {% for error in field.errors %}
+                                    <li>{{ error }}</li>
+                                {% endfor %}
+                            {% endfor %}
                             {% for error in form.non_field_errors %}
                                 <li>{{ error }}</li>
                             {% endfor %}
@@ -115,31 +119,28 @@
                     </div>
                     {% endif %}
 
-                    {# 2. Check for Specific Field Errors #}
-                    {% if form.errors and not form.non_field_errors %}
-                    <div class="alert alert-custom py-2 small rounded-3 mb-3">
-                        <p class="mb-0">Please fix the errors below.</p>
-                    </div>
-                    {% endif %}
-
+                    <!-- Username Field -->
                     <div class="mb-3">
                         <label class="form-label small fw-bold text-muted-custom">Username</label>
                         <input type="text" name="username" class="form-control form-control-lg form-control-custom rounded-3 fs-6" 
                                placeholder="Choose a username" value="{{ form.username.value|default:'' }}" required>
-                        {% if form.username.errors %}
-                            <small class="text-teal">{{ form.username.errors.0 }}</small>
-                        {% endif %}
                     </div>
 
+                    <!-- Email Field -->
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-muted-custom">Email Address</label>
+                        <input type="email" name="email" class="form-control form-control-lg form-control-custom rounded-3 fs-6" 
+                               placeholder="Enter your email" value="{{ form.email.value|default:'' }}" required>
+                    </div>
+
+                    <!-- Password Field -->
                     <div class="mb-3">
                         <label class="form-label small fw-bold text-muted-custom">Password</label>
                         <input type="password" name="password1" class="form-control form-control-lg form-control-custom rounded-3 fs-6" 
                                placeholder="Create a strong password" required>
-                        {% if form.password1.errors %}
-                            <small class="text-teal">{{ form.password1.errors.0 }}</small>
-                        {% endif %}
                     </div>
 
+                    <!-- Confirm Password Field -->
                     <div class="mb-4">
                         <label class="form-label small fw-bold text-muted-custom">Confirm Password</label>
                         <input type="password" name="password2" class="form-control form-control-lg form-control-custom rounded-3 fs-6" 

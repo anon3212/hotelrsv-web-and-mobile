@@ -1,0 +1,178 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book {{ room.name }} - BookInn</title>
+    <style>
+        :root {
+            --primary-teal: #1abc9c;
+            --dark-bg: #1a252f;
+            --card-bg: rgba(44, 62, 80, 0.95);
+            --input-bg: #34495e;
+            --text-light: #ecf0f1;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), 
+                        url('{% static "images/bookinn_bg.jpg" %}') no-repeat center center fixed;
+            background-size: cover;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: var(--text-light);
+            padding: 20px 0;
+        }
+
+        .booking-card {
+            background-color: var(--card-bg);
+            padding: 30px 40px;
+            border-radius: 15px;
+            box-shadow: 0 15px 25px rgba(0,0,0,0.5);
+            width: 100%;
+            max-width: 480px;
+            text-align: center;
+            backdrop-filter: blur(5px);
+        }
+
+        h2 { margin-bottom: 5px; font-size: 22px; color: white; }
+        p.subtitle { font-size: 14px; color: #bdc3c7; margin-bottom: 20px; }
+
+        .form-group { text-align: left; margin-bottom: 15px; }
+        label { display: block; font-size: 13px; margin-bottom: 6px; color: #bdc3c7; font-weight: 600; }
+
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 8px;
+            background-color: var(--input-bg);
+            color: white;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+
+        input:focus { outline: 2px solid var(--primary-teal); }
+
+        /* Payment Section Styling */
+        .payment-box {
+            background-color: rgba(26, 188, 156, 0.1);
+            border: 1px solid var(--primary-teal);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        .qr-container {
+            margin: 10px 0;
+            text-align: center;
+        }
+
+        .qr-code {
+            width: 180px;
+            height: 300px;
+            border-radius: 10px;
+            border: 4px solid white;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+
+        .payment-note {
+            font-size: 12px;
+            color: #1abc9c;
+            margin-top: 5px;
+            font-weight: bold;
+        }
+
+        .btn-confirm {
+            width: 100%;
+            padding: 14px;
+            background-color: var(--primary-teal);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .btn-confirm:hover { background-color: #16a085; transform: translateY(-2px); }
+        .back-link { margin-top: 20px; display: block; font-size: 13px; color: var(--primary-teal); text-decoration: none; }
+    </style>
+</head>
+<body>
+
+<div class="booking-card">
+    <div class="text-center">
+        <img src="{% static 'images/logo.jpg' %}" width="60" alt="BookInn Logo" style="border-radius: 50%; margin-bottom: 10px;">
+    </div>
+
+    <h2>Confirm Your Stay</h2>
+    <p class="subtitle">Booking for: <strong>{{ room.name }}</strong></p>
+
+    <form method="POST" action="{% url 'book_room' room.id %}" enctype="multipart/form-data">
+        {% csrf_token %}
+        
+        <div class="form-group">
+            <label for="guest_name">Guest Full Name</label>
+            <input type="text" name="guest_name" id="guest_name" placeholder="Enter your full name" required>
+        </div>
+
+        <div class="row" style="display: flex; gap: 10px;">
+            <div class="form-group" style="flex: 1;">
+                <label for="check_in">Check-in Date</label>
+                <input type="date" name="check_in" id="check_in" value="{{ check_in }}" required>
+            </div>
+            <div class="form-group" style="flex: 1;">
+                <label for="check_out">Check-out Date</label>
+                <input type="date" name="check_out" id="check_out" value="{{ check_out }}" required>
+            </div>
+        </div>
+
+        <div class="row" style="display: flex; gap: 10px;">
+            <div class="form-group" style="flex: 1.5;">
+                <label for="contact">Contact Number</label>
+                <input type="text" name="contact" id="contact" placeholder="09123456789" required>
+            </div>
+            <div class="form-group" style="flex: 1;">
+                <label for="payment_method">Method</label>
+                <select name="payment_method" id="payment_method">
+                    <option value="GCash">GCash</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- NEW: GCash Payment Instructions & QR Code -->
+        <div class="payment-box">
+            <label style="color: var(--primary-teal); text-align: center; display: block; margin-bottom: 5px;">
+                <i class="fas fa-qrcode"></i> GCash Payment QR
+            </label>
+            <div class="qr-container">
+                <!-- Using your static gcash_qr.jpg -->
+                <img src="{% static 'images/gcash_qr.jpg' %}" alt="GCash QR Code" class="qr-code">
+            </div>
+            <p class="payment-note">Scan QR and upload the receipt below.</p>
+        </div>
+
+        <div class="form-group">
+            <label for="payment_reference">Reference Number</label>
+            <input type="text" name="payment_reference" id="payment_reference" placeholder="Enter 13-digit Ref No.">
+        </div>
+
+        <div class="form-group">
+            <label for="receipt_screenshot">Upload Receipt Screenshot</label>
+            <input type="file" name="receipt_screenshot" id="receipt_screenshot" accept="image/*" required>
+        </div>
+
+        <button type="submit" class="btn-confirm">Complete Booking</button>
+    </form>
+
+    <a href="{% url 'home' %}" class="back-link">← Cancel and go back</a>
+</div>
+
+</body>
+</html>

@@ -5,60 +5,181 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BookInn Admin - Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        body { background-color: #f7f6f2; font-family: 'Inter', sans-serif; }
-        .sidebar { background-color: #1a1a1a; }
-        .card { background: white; border-radius: 8px; border: 1px solid #e5e5e1; }
-        .btn-new { background-color: #2d4a3e; color: white; }
+        body {
+            background: radial-gradient(circle at top left, rgba(24, 132, 126, 0.25), transparent 25%),
+                        linear-gradient(180deg, #02343f 0%, #031e25 100%);
+            color: #e6f7f5;
+            font-family: 'Inter', sans-serif;
+        }
+        .sidebar {
+            background-color: #042f35;
+            box-shadow: 4px 0 30px rgba(0, 0, 0, 0.25);
+        }
+        .sidebar h1, .sidebar p, .sidebar a {
+            color: #e6f7f5;
+        }
+        .nav-link {
+            color: #c8f0ed;
+        }
+        .nav-link:hover, .nav-link.active {
+            background-color: rgba(30, 165, 157, 0.18);
+            color: #ffffff;
+        }
+        .card {
+            background: rgba(7, 42, 48, 0.92);
+            border-radius: 18px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 18px 35px rgba(0, 0, 0, 0.18);
+            color: #e6f7f5;
+        }
+        .card p, .card h3, .card h4, .card td, .card th {
+            color: #e6f7f5;
+        }
+        .btn-new {
+            background-color: #20b2a0;
+            color: white;
+        }
+        .btn-new:hover {
+            background-color: #1a9a87;
+        }
+        .btn-secondary {
+            background: rgba(9, 68, 74, 0.8);
+            color: #c8f0ed;
+            border-color: rgba(56, 189, 169, 0.25);
+            box-shadow: inset 0 0 0 1px rgba(56, 189, 169, 0.12);
+        }
+        .btn-secondary:hover {
+            background: rgba(25, 125, 118, 0.92);
+        }
+        .room-card {
+            background: rgba(8, 55, 63, 0.95);
+            border: 1px solid rgba(110, 195, 183, 0.18);
+        }
+        .room-card h5, .room-card p, .room-card span, .room-card a, .room-card button {
+            color: #e6f7f5;
+        }
+        .room-card .room-type,
+        .room-card .room-features {
+            color: #b9e6e1;
+        }
+        .room-card .room-price {
+            color: #d5f6ef;
+        }
+        .text-gray-500, .text-gray-400, .text-gray-800, .text-gray-600, .text-gray-200 {
+            color: #c7eae8 !important;
+        }
+        .bg-gray-50 {
+            background-color: rgba(255,255,255,0.06) !important;
+        }
+        .border-gray-100, .border-gray-800, .border-gray-200 {
+            border-color: rgba(255,255,255,0.08) !important;
+        }
+        .table-custom thead {
+            border-bottom: 1px solid rgba(255,255,255,0.12);
+        }
+        .table-custom th {
+            color: #9ee8e4;
+            font-size: 0.75rem;
+            letter-spacing: 0.08em;
+        }
+        .table-custom tbody tr:hover {
+            background-color: rgba(255,255,255,0.04);
+        }
+        .badge {
+            font-size: 0.7rem;
+            letter-spacing: 0.02em;
+        }
+        .modal-content {
+            background: #062c33;
+            color: #f2faf9;
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+        .modal-backdrop.show {
+            opacity: 0.5;
+            background: #000000;
+        }
+        /* Smooth transition for modals */
+        .modal-active { display: flex !important; }
     </style>
 </head>
-<body class="flex h-screen">
+<body class="flex h-screen overflow-hidden">
 
-    <aside class="sidebar w-64 text-gray-400 p-6 flex flex-col">
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar w-64 text-gray-400 p-6 flex flex-col shrink-0">
         <div class="mb-10">
             <h1 class="text-white text-2xl font-bold">BookInn</h1>
             <p class="text-xs uppercase tracking-widest">admin portal</p>
         </div>
         
-        <nav class="flex-1 space-y-4">
-            <p class="text-[10px] uppercase font-bold text-gray-600">Overview</p>
-            <a href="#" class="flex items-center text-white bg-gray-800 p-2 rounded">
+        <nav class="flex-1 space-y-2">
+            <p class="text-[10px] uppercase font-bold text-gray-600 mb-4">Overview</p>
+            <a href="{% url 'admin_dashboard' %}" class="nav-link flex items-center text-white bg-gray-800 p-2 rounded">
                 <span class="mr-3">⊞</span> Dashboard
             </a>
             
-            <p class="text-[10px] uppercase font-bold text-gray-600 mt-6">Management</p>
-            <a href="#" class="flex items-center hover:text-white p-2">📅 Reservations</a>
-            <a href="#" class="flex items-center hover:text-white p-2">🏨 Room Listings</a>
-            <a href="#" class="flex items-center hover:text-white p-2">👤 Guest Records</a>
-            <a href="#" class="flex items-center hover:text-white p-2">💳 Payments</a>
+            <p class="text-[10px] uppercase font-bold text-gray-600 mt-6 mb-4">Management</p>
+            <a href="{% url 'manage_reservations_page' %}" class="nav-link flex items-center hover:text-white p-2 rounded transition">
+                <span class="mr-3">📅</span> Reservations
+            </a>
+            <a href="{% url 'manage_rooms_page' %}" class="nav-link flex items-center hover:text-white p-2 rounded transition">
+                <span class="mr-3">🏨</span> Room Listings
+            </a>
+            <a href="{% url 'manage_guests_page' %}" class="nav-link flex items-center hover:text-white p-2 rounded transition">
+                <span class="mr-3">👤</span> Guest Records
+            </a>
         </nav>
 
-        <div class="mt-auto pt-6 border-t border-gray-800 flex items-center">
-            <div class="w-8 h-8 bg-green-800 rounded-full flex items-center justify-center text-white text-xs mr-3">HA</div>
-            <div>
-                <p class="text-sm text-white">Hotel Admin</p>
-                <p class="text-[10px]">administrator</p>
+        <div class="mt-auto pt-6 border-t border-gray-800 flex items-center justify-between">
+            <div class="flex items-center">
+                <div class="w-8 h-8 bg-green-800 rounded-full flex items-center justify-center text-white text-xs mr-3">
+                    {{ request.user.username|slice:":2"|upper }}
+                </div>
+                <div>
+                    <p class="text-sm text-white">{{ request.user.username }}</p>
+                    <p class="text-[10px]">administrator</p>
+                </div>
             </div>
+            <a href="{% url 'logout' %}" class="text-gray-500 hover:text-red-500 transition" title="Logout">
+                <i class="fas fa-sign-out-alt"></i>
+            </a>
         </div>
     </aside>
 
+    <!-- Main Content Area -->
     <main class="flex-1 overflow-y-auto p-8">
+        <!-- Django Messages -->
+        {% if messages %}
+            {% for message in messages %}
+                <div class="mb-4 p-3 rounded {% if message.tags == 'success' %}bg-green-100 text-green-700 border border-green-200{% else %}bg-orange-100 text-orange-700 border border-orange-200{% endif %} text-sm">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+
         <header class="flex justify-between items-center mb-8">
             <div>
-                <h2 class="text-2xl font-bold text-gray-800">Dashboard</h2>
-                <p class="text-sm text-gray-500">{{ current_date|date:"l, F d, Y" }}</p>
+                <h2 class="text-2xl font-bold text-white">Dashboard</h2>
+                <p class="text-sm text-teal-200">{{ current_date|date:"l, F d, Y" }}</p>
             </div>
-            <div class="space-x-2">
-                <button class="px-4 py-2 border rounded-md bg-white text-sm font-medium">+ Add Room</button>
-                <button class="px-4 py-2 btn-new rounded-md text-sm font-medium">New Reservation</button>
+            <div class="flex gap-3">
+                <!-- Updated buttons to trigger modals -->
+                <button onclick="toggleModal('addRoomModal')" class="px-4 py-2 border rounded-md btn-secondary text-sm font-medium hover:bg-teal-500/15 transition shadow-sm">
+                    + Add Room
+                </button>
+                <button onclick="toggleModal('newReservationModal')" class="px-4 py-2 btn-new rounded-md text-sm font-medium hover:bg-teal-400 transition shadow-sm">
+                    New Reservation
+                </button>
             </div>
         </header>
 
+        <!-- Stats Grid -->
         <div class="grid grid-cols-4 gap-6 mb-8">
             <div class="card p-6">
                 <p class="text-xs text-gray-500 uppercase font-bold">Total Rooms</p>
                 <h3 class="text-3xl font-bold mt-1">{{ total_rooms }}</h3>
-                <p class="text-[10px] text-gray-400 mt-1">4 types · Standard, Deluxe, Suite, Family</p>
+                <p class="text-[10px] text-gray-400 mt-1">Managed inventory</p>
             </div>
             <div class="card p-6 border-l-4 border-l-red-500">
                 <p class="text-xs text-gray-500 uppercase font-bold">Rooms Occupied</p>
@@ -68,31 +189,78 @@
             <div class="card p-6">
                 <p class="text-xs text-gray-500 uppercase font-bold">Active Reservations</p>
                 <h3 class="text-3xl font-bold mt-1">{{ active_reservations_count }}</h3>
-                <p class="text-[10px] text-teal-600 mt-1">3 checking in today</p>
+                <p class="text-[10px] text-teal-600 mt-1">Confirmed bookings</p>
             </div>
             <div class="card p-6">
                 <p class="text-xs text-gray-500 uppercase font-bold">Pending Payments</p>
                 <h3 class="text-3xl font-bold mt-1">{{ pending_payments_count }}</h3>
-                <p class="text-[10px] text-gray-400 mt-1">Awaiting GCash / arrival</p>
+                <p class="text-[10px] text-orange-600 mt-1">Under Review</p>
             </div>
         </div>
 
-        <section class="card overflow-hidden">
+        <!-- Room Listings Section -->
+        <section class="card overflow-hidden mb-8">
             <div class="p-6 border-b flex justify-between items-center">
-                <h4 class="font-bold">Reservations</h4>
-                <button class="text-xs border px-3 py-1 rounded hover:bg-gray-50">View all</button>
-            </div>
-            
-            <div class="flex border-b bg-gray-50 text-xs font-bold text-gray-500">
-                <button class="px-6 py-3 border-b-2 border-green-700 text-green-800">All</button>
-                <button class="px-6 py-3">Confirmed</button>
-                <button class="px-6 py-3">Checked In</button>
-                <button class="px-6 py-3">Pending</button>
-                <button class="px-6 py-3">Checked Out</button>
+                <h4 class="font-bold text-white">Room Listings</h4>
+                <a href="{% url 'manage_rooms_page' %}" class="text-xs border border-teal-300 text-teal-100 px-3 py-1 rounded hover:bg-teal-500/10">View all</a>
             </div>
 
-            <table class="w-full text-left text-sm">
-                <thead class="bg-gray-50 text-gray-400 uppercase text-[10px] border-b">
+            <div class="p-6">
+                {% if rooms %}
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {% for room in rooms %}
+                    <div class="room-card rounded-lg p-4 shadow-sm hover:shadow-lg transition">
+                        <div class="flex justify-between items-start mb-3">
+                            <h5 class="font-bold text-white">{{ room.name }}</h5>
+                            <span class="px-3 py-1 rounded-full text-[10px] font-bold border border-white/10
+                                {% if room.status == 'Available' %}bg-emerald-500/15 text-emerald-100
+                                {% elif room.status == 'Occupied' %}bg-red-500/15 text-red-100
+                                {% else %}bg-yellow-400/15 text-yellow-100{% endif %}">
+                                {{ room.status }}
+                            </span>
+                        </div>
+                        <p class="text-sm room-type mb-2">{{ room.room_type }}</p>
+                        <p class="text-lg font-bold room-price mb-2">₱{{ room.price }}</p>
+                        <p class="text-xs room-features mb-4">{{ room.features|truncatechars:50 }}</p>
+                        <div class="flex justify-between items-center gap-2">
+                            <button onclick="openEditRoomModal({{ room.id }}, '{{ room.name }}', '{{ room.room_type }}', '{{ room.status }}', '{{ room.price }}', '{{ room.features }}')" 
+                                    class="text-xs bg-teal-500 text-white px-3 py-1 rounded font-bold hover:bg-teal-400 transition">
+                                Edit
+                            </button>
+                            <a href="/admin/myapp/room/{{ room.id }}/delete/" 
+                               class="text-xs text-red-300 hover:text-red-100 hover:underline"
+                               onclick="return confirm('Delete this room?')">
+                                Delete
+                            </a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center py-10 text-gray-400 italic">
+                    No rooms found.
+                </div>
+                {% endif %}
+            </div>
+        </section>
+
+        <!-- Reservations Section -->
+        <section class="card overflow-hidden">
+            <div class="p-6 border-b flex justify-between items-center">
+                <h4 class="font-bold">Recent Reservations</h4>
+                <a href="/admin/myapp/reservation/" class="text-xs border px-3 py-1 rounded hover:bg-gray-50">View all</a>
+            </div>
+            
+            <div class="flex border-b bg-gray-50 text-xs font-bold text-teal-100">
+                <button class="px-6 py-3 border-b-2 border-teal-300 text-teal-100">All</button>
+                <a href="/admin/myapp/reservation/?status__exact=Confirmed" class="px-6 py-3 hover:bg-teal-500/10 transition">Confirmed</a>
+                <a href="/admin/myapp/reservation/?status__exact=Checked In" class="px-6 py-3 hover:bg-teal-500/10 transition">Checked In</a>
+                <a href="/admin/myapp/reservation/?status__exact=Pending" class="px-6 py-3 hover:bg-teal-500/10 transition">Pending</a>
+                <a href="/admin/myapp/reservation/?status__exact=Checked Out" class="px-6 py-3 hover:bg-teal-500/10 transition">Checked Out</a>
+            </div>
+
+            <table class="table-custom w-full text-left text-sm">
+                <thead class="bg-gray-50 uppercase text-[10px] border-b">
                     <tr>
                         <th class="px-6 py-4">Booking ID</th>
                         <th class="px-6 py-4">Guest Name</th>
@@ -102,7 +270,7 @@
                         <th class="px-6 py-4">Check-Out</th>
                         <th class="px-6 py-4">Payment</th>
                         <th class="px-6 py-4">Status</th>
-                        <th class="px-6 py-4">Action</th>
+                        <th class="px-6 py-4">Quick Actions</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-100">
@@ -111,19 +279,62 @@
                         <td class="px-6 py-4 text-gray-400">#{{ res.booking_id }}</td>
                         <td class="px-6 py-4 font-medium">{{ res.guest_name }}</td>
                         <td class="px-6 py-4 text-gray-400">{{ res.contact }}</td>
-                        <td class="px-6 py-4">{{ res.room_type }}<br><span class="text-xs text-gray-400">{{ res.room_number }}</span></td>
+                        <td class="px-6 py-4">
+                            {{ res.room.room_type }}<br>
+                            <span class="text-xs text-gray-400">{{ res.room.name }}</span>
+                        </td>
                         <td class="px-6 py-4">{{ res.check_in|date:"M d" }}</td>
                         <td class="px-6 py-4">{{ res.check_out|date:"M d" }}</td>
                         <td class="px-6 py-4">
-                            <span class="px-2 py-1 bg-blue-50 text-blue-600 rounded text-[10px] font-bold block w-fit">GCASH</span>
-                            <span class="text-[10px] text-gray-400">{{ res.payment_status }}</span>
+                            <span class="px-2 py-1 bg-blue-50 text-blue-600 rounded text-[10px] font-bold block w-fit">
+                                {{ res.payment_method|upper }}
+                            </span>
+                            <span class="text-[10px] {% if res.payment_status == 'Under Review' %}text-orange-500{% else %}text-gray-400{% endif %}">
+                                {{ res.payment_status }}
+                            </span>
                         </td>
                         <td class="px-6 py-4">
-                            <span class="px-3 py-1 {% if res.status == 'Confirmed' %}bg-green-50 text-green-600{% else %}bg-orange-50 text-orange-600{% endif %} rounded-full text-[10px] font-bold">
+                            <span class="px-3 py-1 
+                                {% if res.status == 'Confirmed' %}bg-green-50 text-green-600
+                                {% elif res.status == 'Checked In' %}bg-blue-50 text-blue-600
+                                {% elif res.status == 'Pending' %}bg-orange-50 text-orange-600
+                                {% else %}bg-gray-50 text-gray-600{% endif %} 
+                                rounded-full text-[10px] font-bold">
                                 {{ res.status }}
                             </span>
                         </td>
-                        <td class="px-6 py-4"><a href="#" class="text-blue-600 hover:underline">Edit</a></td>
+                        <td class="px-6 py-4">
+                            <div class="flex flex-col gap-1">
+                                {% if res.payment_status == 'Under Review' %}
+                                    <a href="{% url 'update_reservation_status' res.id 'approve_payment' %}" 
+                                       class="text-[10px] bg-green-600 text-white px-2 py-1 rounded text-center font-bold hover:bg-green-700 transition">
+                                        Approve Payment
+                                    </a>
+                                {% endif %}
+
+                                {% if res.status == 'Confirmed' %}
+                                    <a href="{% url 'update_reservation_status' res.id 'check_in' %}" 
+                                       class="text-[10px] bg-blue-600 text-white px-2 py-1 rounded text-center font-bold hover:bg-blue-700 transition">
+                                        Mark Check-In
+                                    </a>
+                                {% endif %}
+
+                                {% if res.status == 'Checked In' %}
+                                    <a href="{% url 'update_reservation_status' res.id 'check_out' %}" 
+                                       class="text-[10px] bg-gray-800 text-white px-2 py-1 rounded text-center font-bold hover:bg-black transition">
+                                        Check-Out
+                                    </a>
+                                {% endif %}
+
+                                {% if res.status == 'Pending' or res.status == 'Confirmed' %}
+                                    <a href="{% url 'update_reservation_status' res.id 'cancel' %}" 
+                                       class="text-[10px] text-red-500 hover:underline text-center mt-1"
+                                       onclick="return confirm('Cancel this reservation?')">
+                                        Cancel
+                                    </a>
+                                {% endif %}
+                            </div>
+                        </td>
                     </tr>
                     {% empty %}
                     <tr>
@@ -134,5 +345,147 @@
             </table>
         </section>
     </main>
+
+    <!-- MODALS SECTION -->
+
+    <!-- Add Room Modal -->
+    <div id="addRoomModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-md overflow-hidden">
+            <div class="p-6 border-b flex justify-between items-center bg-gray-50">
+                <h3 class="font-bold text-gray-800">Add New Room</h3>
+                <button onclick="toggleModal('addRoomModal')" class="text-gray-400 hover:text-gray-600 text-2xl leading-none">&times;</button>
+            </div>
+            <form method="POST" action="/admin/myapp/room/add/" class="p-6 space-y-4">
+                {% csrf_token %}
+                <div>
+                    <label class="text-[10px] font-bold uppercase text-gray-400">Room Name/Number</label>
+                    <input type="text" name="name" required class="w-full border rounded p-2 mt-1 outline-none focus:border-green-800" placeholder="e.g. Room 101">
+                </div>
+                <div>
+                    <label class="text-[10px] font-bold uppercase text-gray-400">Room Type</label>
+                    <select name="room_type" class="w-full border rounded p-2 mt-1 outline-none bg-white">
+                        <option value="Standard">Standard</option>
+                        <option value="Deluxe">Deluxe</option>
+                        <option value="Suite">Suite</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="text-[10px] font-bold uppercase text-gray-400">Price per Night</label>
+                    <input type="number" name="price" required class="w-full border rounded p-2 mt-1 outline-none" placeholder="₱">
+                </div>
+                <div class="pt-4 flex gap-2">
+                    <button type="submit" class="flex-1 bg-green-800 text-white py-2 rounded font-bold hover:bg-green-900 transition">Save Room</button>
+                    <button type="button" onclick="toggleModal('addRoomModal')" class="flex-1 bg-gray-100 text-gray-600 py-2 rounded font-bold hover:bg-gray-200 transition">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- New Reservation Modal -->
+    <div id="newReservationModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-lg overflow-hidden">
+            <div class="p-6 border-b flex justify-between items-center bg-gray-50">
+                <h3 class="font-bold text-gray-800">New Booking Entry</h3>
+                <button onclick="toggleModal('newReservationModal')" class="text-gray-400 hover:text-gray-600 text-2xl leading-none">&times;</button>
+            </div>
+            <form method="POST" action="/admin/myapp/reservation/add/" class="p-6 grid grid-cols-2 gap-4">
+                {% csrf_token %}
+                <div class="col-span-2">
+                    <label class="text-[10px] font-bold uppercase text-gray-400">Guest Name</label>
+                    <input type="text" name="guest_name" required class="w-full border rounded p-2 mt-1 outline-none focus:border-[#2d4a3e]">
+                </div>
+                <div>
+                    <label class="text-[10px] font-bold uppercase text-gray-400">Check-in</label>
+                    <input type="date" name="check_in" required class="w-full border rounded p-2 mt-1 outline-none">
+                </div>
+                <div>
+                    <label class="text-[10px] font-bold uppercase text-gray-400">Check-out</label>
+                    <input type="date" name="check_out" required class="w-full border rounded p-2 mt-1 outline-none">
+                </div>
+                <div class="col-span-2 pt-4">
+                    <button type="submit" class="w-full bg-[#2d4a3e] text-white py-3 rounded font-bold hover:opacity-90 transition">Create Reservation</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Edit Room Modal -->
+    <div id="editRoomModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-md overflow-hidden">
+            <div class="p-6 border-b flex justify-between items-center bg-gray-50">
+                <h3 class="font-bold text-gray-800">Edit Room</h3>
+                <button onclick="toggleModal('editRoomModal')" class="text-gray-400 hover:text-gray-600 text-2xl leading-none">&times;</button>
+            </div>
+            <form method="POST" action="/admin/myapp/room/update/" class="p-6 space-y-4">
+                {% csrf_token %}
+                <input type="hidden" name="room_id" id="editRoomId">
+                <div>
+                    <label class="text-[10px] font-bold uppercase text-gray-400">Room Name/Number</label>
+                    <input type="text" name="name" id="editRoomName" required class="w-full border rounded p-2 mt-1 outline-none focus:border-green-800" placeholder="e.g. Room 101">
+                </div>
+                <div>
+                    <label class="text-[10px] font-bold uppercase text-gray-400">Room Type</label>
+                    <select name="room_type" id="editRoomType" class="w-full border rounded p-2 mt-1 outline-none bg-white">
+                        <option value="Standard">Standard</option>
+                        <option value="Deluxe">Deluxe</option>
+                        <option value="Suite">Suite</option>
+                        <option value="Family">Family</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="text-[10px] font-bold uppercase text-gray-400">Status</label>
+                    <select name="status" id="editRoomStatus" class="w-full border rounded p-2 mt-1 outline-none bg-white">
+                        <option value="Available">Available</option>
+                        <option value="Occupied">Occupied</option>
+                        <option value="Maintenance">Maintenance</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="text-[10px] font-bold uppercase text-gray-400">Price per Night</label>
+                    <input type="number" name="price" id="editRoomPrice" required class="w-full border rounded p-2 mt-1 outline-none" placeholder="₱" step="0.01">
+                </div>
+                <div>
+                    <label class="text-[10px] font-bold uppercase text-gray-400">Features</label>
+                    <textarea name="features" id="editRoomFeatures" class="w-full border rounded p-2 mt-1 outline-none focus:border-green-800" rows="3" placeholder="Room features..."></textarea>
+                </div>
+                <div class="pt-4 flex gap-2">
+                    <button type="submit" class="flex-1 bg-green-800 text-white py-2 rounded font-bold hover:bg-green-900 transition">Update Room</button>
+                    <button type="button" onclick="toggleModal('editRoomModal')" class="flex-1 bg-gray-100 text-gray-600 py-2 rounded font-bold hover:bg-gray-200 transition">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- JavaScript for Modal Control -->
+    <script>
+        function toggleModal(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal.classList.contains('hidden')) {
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+            } else {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }
+        }
+
+        function openEditRoomModal(id, name, type, status, price, features) {
+            document.getElementById('editRoomId').value = id;
+            document.getElementById('editRoomName').value = name;
+            document.getElementById('editRoomType').value = type;
+            document.getElementById('editRoomStatus').value = status;
+            document.getElementById('editRoomPrice').value = price;
+            document.getElementById('editRoomFeatures').value = features.replace(/'/g, "\\'"); // Escape single quotes
+            toggleModal('editRoomModal');
+        }
+
+        // Close modal if user clicks anywhere outside of the modal box
+        window.onclick = function(event) {
+            if (event.target.classList.contains('bg-black/50')) {
+                event.target.classList.add('hidden');
+                event.target.classList.remove('flex');
+            }
+        }
+    </script>
 </body>
 </html>

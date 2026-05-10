@@ -5,13 +5,14 @@ import {
 } from 'react-native';
 import { Feather } from '@expo/vector-icons'; 
 import { BASE_URL } from '../constants/theme';
+import { roomsAPI } from '../services/api';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
 const CARD_WIDTH = (SCREEN_WIDTH - 50) / 2; 
 
 const CATEGORIES = ['All', 'Standard', 'Deluxe', 'Suite'];
 
-export default function ExploreScreen({ onLogout, onRoomPress }) {
+export default function ExploreScreen({ onLogout, onRoomPress, onProfilePress }) {
   const [rooms, setRooms] = useState([]);
   const [activeCategory, setActiveCategory] = useState('All');
 
@@ -21,18 +22,17 @@ export default function ExploreScreen({ onLogout, onRoomPress }) {
 
   const fetchRooms = async () => {
     try {
-      const response = await fetch(`${BASE_URL}/api/rooms/`);
-      const data = await response.json();
+      const data = await roomsAPI.listRooms();
       setRooms(data);
     } catch (error) {
-      console.error("Fetch error:", error);
+      console.error('Fetch error:', error);
     }
   };
 
   // Filter rooms based on the selected category
   const filteredRooms = activeCategory === 'All' 
     ? rooms 
-    : rooms.filter(room => room.category === activeCategory);
+    : rooms.filter(room => room.room_type === activeCategory);
 
   const renderHeader = () => (
     <View>
@@ -41,8 +41,13 @@ export default function ExploreScreen({ onLogout, onRoomPress }) {
           <Text style={styles.greetingText}>Good morning 👋</Text>
           <Text style={styles.mainTitle}>Find your room</Text>
         </View>
-        <View style={styles.avatarCircle}>
-          <Text style={styles.avatarText}>JD</Text>
+        <View style={styles.headerActions}>
+          <TouchableOpacity onPress={onProfilePress} style={styles.avatarCircle}>
+            <Text style={styles.avatarText}>👤</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={onLogout} style={styles.logoutBtn}>
+            <Text style={styles.logoutText}>Logout</Text>
+          </TouchableOpacity>
         </View>
       </View>
 
@@ -106,6 +111,7 @@ export default function ExploreScreen({ onLogout, onRoomPress }) {
               </ImageBackground>
               <View style={styles.cardFooter}>
                 <Text style={styles.roomName} numberOfLines={1}>{item.name || 'Standard'}</Text>
+                <Text style={styles.availableCount}>{item.available_count ?? 0} available</Text>
                 <View style={styles.priceContainer}>
                   <Text style={styles.priceText}>₱{item.price || '999'}</Text>
                   <Text style={styles.perNight}>/night</Text>
@@ -116,20 +122,6 @@ export default function ExploreScreen({ onLogout, onRoomPress }) {
         />
       </View>
 
-      <View style={styles.bottomNav}>
-         <View style={styles.navItem}>
-           <Feather name="bar-chart-2" size={24} color="#00BFA5" />
-           <Text style={styles.navTextActive}>Explore</Text>
-         </View>
-         <TouchableOpacity style={styles.navItem} onPress={onLogout}>
-           <Feather name="log-out" size={24} color="#666" />
-           <Text style={styles.navText}>Logout</Text>
-         </TouchableOpacity>
-         <View style={styles.navItem}>
-           <Feather name="user" size={24} color="#666" />
-           <Text style={styles.navText}>Profile</Text>
-         </View>
-      </View>
     </ImageBackground>
   );
 }
@@ -141,8 +133,11 @@ const styles = StyleSheet.create({
   header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 60, marginBottom: 25 },
   greetingText: { color: '#888', fontSize: 16 },
   mainTitle: { color: '#fff', fontSize: 28, fontWeight: 'bold' },
+  headerActions: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   avatarCircle: { width: 45, height: 45, borderRadius: 22.5, backgroundColor: '#00BFA5', justifyContent: 'center', alignItems: 'center' },
-  avatarText: { color: '#fff', fontWeight: 'bold' },
+  avatarText: { color: '#fff', fontWeight: 'bold', fontSize: 20 },
+  logoutBtn: { paddingHorizontal: 12, paddingVertical: 8, backgroundColor: '#FF6B6B', borderRadius: 6 },
+  logoutText: { color: 'white', fontWeight: '600', fontSize: 12 },
   searchContainer: { flexDirection: 'row', backgroundColor: '#1A2129', borderRadius: 15, alignItems: 'center', paddingHorizontal: 15, height: 55 },
   searchIcon: { marginRight: 10 },
   searchInput: { color: '#fff', flex: 1, fontSize: 16 },
@@ -159,11 +154,9 @@ const styles = StyleSheet.create({
   availableText: { color: '#fff', fontSize: 9, fontWeight: 'bold' },
   cardFooter: { padding: 8 },
   roomName: { color: '#fff', fontSize: 15, fontWeight: 'bold' },
+  availableCount: { color: '#A3F7BF', fontSize: 11, marginTop: 4 },
   priceContainer: { flexDirection: 'row', alignItems: 'baseline', marginTop: 4 },
   priceText: { color: '#00BFA5', fontSize: 16, fontWeight: 'bold' },
   perNight: { color: '#666', fontSize: 10, marginLeft: 2 },
-  bottomNav: { flexDirection: 'row', justifyContent: 'space-around', backgroundColor: '#0B0F17', paddingVertical: 15, borderTopWidth: 0.5, borderTopColor: '#222', position: 'absolute', bottom: 0, width: '100%' },
-  navItem: { alignItems: 'center' },
-  navText: { color: '#666', fontSize: 12, marginTop: 4 },
-  navTextActive: { color: '#00BFA5', fontSize: 12, marginTop: 4 }
+
 });

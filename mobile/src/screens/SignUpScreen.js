@@ -1,14 +1,35 @@
 import React, { useState } from 'react';
 import { 
   View, Text, TextInput, TouchableOpacity, 
-  StyleSheet, ImageBackground, KeyboardAvoidingView, Platform 
+  StyleSheet, ImageBackground, KeyboardAvoidingView, Platform, Alert, ActivityIndicator
 } from 'react-native';
 import { Feather } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { authAPI } from '../services/api';
 
-export default function SignUpScreen({ onSignUp, onGoToLogin }) {
+export default function SignUpScreen({ onSignUpSuccess, onGoToLogin }) {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const handleSignUp = async () => {
+    if (!name || !email || !password) {
+      Alert.alert('Sign up required', 'Please fill in all fields.');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const result = await authAPI.register(name.trim(), email.trim(), password);
+      await AsyncStorage.setItem('authToken', result.token);
+      onSignUpSuccess();
+    } catch (error) {
+      Alert.alert('Signup Failed', error.message || 'Unable to create your account.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <ImageBackground source={require('../../assets/bg.jpg')} style={styles.container}>
@@ -56,8 +77,12 @@ export default function SignUpScreen({ onSignUp, onGoToLogin }) {
             />
           </View>
 
-          <TouchableOpacity style={styles.loginBtn} onPress={onSignUp}>
-            <Text style={styles.loginBtnText}>Create Account</Text>
+          <TouchableOpacity style={styles.loginBtn} onPress={handleSignUp} disabled={loading}>
+            {loading ? (
+              <ActivityIndicator color="#fff" />
+            ) : (
+              <Text style={styles.loginBtnText}>Create Account</Text>
+            )}
           </TouchableOpacity>
 
           <View style={styles.footer}>

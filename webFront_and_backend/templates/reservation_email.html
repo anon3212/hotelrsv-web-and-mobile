@@ -1,0 +1,12 @@
+from django.template.loader import render_to_string
+from django.core.mail import EmailMessage
+
+html_content = render_to_string('emails/reservation_confirmation.html', {'booking': booking_obj})
+email = EmailMessage(
+    "Your Reservation Details",
+    html_content,
+    "reservations@myhotel.com",
+    [user_email],
+)
+email.content_subtype = "html"  # This is the key part!
+email.send()

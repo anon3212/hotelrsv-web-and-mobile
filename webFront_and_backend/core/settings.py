@@ -100,8 +100,18 @@ USE_TZ = True
 # Static and Media
 STATIC_URL = 'static/'
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
+STATIC_ROOT = BASE_DIR / "staticfiles"
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend' # Default Django SMTP
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'juariojedcyrus@gmail.com'
+EMAIL_HOST_PASSWORD = 'xbzv zwve ijlm bqon'
+
+DEFAULT_FROM_EMAIL = 'juariojedcyrus@gmail.com'

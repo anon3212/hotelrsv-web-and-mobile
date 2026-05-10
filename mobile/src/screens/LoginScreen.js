@@ -1,13 +1,34 @@
 import React, { useState } from 'react';
 import { 
   View, Text, TextInput, TouchableOpacity, 
-  StyleSheet, ImageBackground, KeyboardAvoidingView, Platform 
+  StyleSheet, ImageBackground, KeyboardAvoidingView, Platform, Alert, ActivityIndicator
 } from 'react-native';
 import { Feather } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { authAPI } from '../services/api';
 
-export default function LoginScreen({ onLogin, onGoToSignUp }) {
+export default function LoginScreen({ onLoginSuccess, onGoToSignUp }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const handleLogin = async () => {
+    if (!email || !password) {
+      Alert.alert('Login required', 'Please enter your email and password.');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const result = await authAPI.login(email.trim(), password);
+      await AsyncStorage.setItem('authToken', result.token);
+      onLoginSuccess();
+    } catch (error) {
+      Alert.alert('Login Failed', error.message || 'Unable to sign in.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <ImageBackground source={require('../../assets/bg.jpg')} style={styles.container}>
@@ -44,8 +65,12 @@ export default function LoginScreen({ onLogin, onGoToSignUp }) {
             />
           </View>
 
-          <TouchableOpacity style={styles.loginBtn} onPress={onLogin}>
-            <Text style={styles.loginBtnText}>Sign In</Text>
+          <TouchableOpacity style={styles.loginBtn} onPress={handleLogin} disabled={loading}>
+            {loading ? (
+              <ActivityIndicator color="#fff" />
+            ) : (
+              <Text style={styles.loginBtnText}>Sign In</Text>
+            )}
           </TouchableOpacity>
 
           <View style={styles.footer}>
