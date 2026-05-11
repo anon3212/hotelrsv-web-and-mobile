@@ -1,0 +1,96 @@
+/* style.css */
+
+:root {
+    --primary-blue: #0066FF; /* Vibrant blue from logo */
+    --deep-black: #1A1A1A; /* Black from logo/login page */
+    --muted-white: rgba(255, 255, 255, 0.75); /* Readability color */
+}
+
+/* Base Body Style for the entire site */
+body {
+    background: linear-gradient(rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.75)), 
+                url("../images/bookinn_bg.jpg"); 
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    background-repeat: no-repeat;
+    font-family: 'Inter', sans-serif;
+    color: #ffffff; 
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Ensure the content pushes the footer to the bottom */
+main, .container {
+    flex: 1;
+}
+
+/* --- Improved Transparent Footer --- */
+footer {
+    background-color: transparent !important; /* Removes the white rectangle */
+    padding: 30px 0 !important;
+    text-align: center;
+}
+
+.footer-text {
+    color: rgba(255, 255, 255, 0.6) !important; /* Floating muted white text */
+    font-size: 0.9rem;
+    letter-spacing: 0.5px;
+}
+
+/* --- Global Text Styles --- */
+.text-muted {
+    color: var(--muted-white) !important;
+}
+
+h2, .fw-bold {
+    color: #ffffff !important;
+}
+
+/* --- Search Bar & Room Card Refinement --- */
+.card, .search-card {
+    background-color: #ffffff !important;
+    border-radius: 16px;
+    border: none !important;
+    color: #000000; 
+}
+
+.card .text-muted, .search-card .text-muted {
+    color: #6c757d !important; 
+}
+
+/* --- Primary Brand Buttons --- */
+.btn-primary {
+    background-color: var(--primary-blue) !important;
+    border: none !important;
+    border-radius: 50px;
+    font-weight: 600;
+}
+
+.btn-primary:hover {
+    background-color: #0052cc !important;
+    box-shadow: 0 4px 15px rgba(0, 102, 255, 0.3);
+}
+
+/* --- Quick Filter Buttons Style --- */
+.filter-container {
+    gap: 12px;
+    padding-bottom: 2px;
+}
+
+.btn-outline-dark.filter-btn {
+    color: #ffffff !important; 
+    border-color: rgba(255, 255, 255, 0.3) !important; 
+    border-radius: 50px;
+    transition: 0.3s;
+}
+
+.btn-outline-dark.filter-btn:hover {
+    background-color: rgba(255, 255, 255, 0.1) !important; 
+    color: #ffffff !important;
+}
+
+.btn-primary.filter-btn {
+    border: none !important;
+}

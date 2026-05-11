@@ -12,7 +12,12 @@
 
 <div class="container-fluid p-5">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="fw-bold">Manage Reservations</h2>
+        <div>
+            <h2 class="fw-bold">Manage Reservations</h2>
+            <p class="text-muted mb-0" style="font-size: 0.95rem;">
+                Cancellation requests within 20 days of the booked check-in are non-refundable unless approved by admin.
+            </p>
+        </div>
         <a href="{% url 'admin_dashboard' %}" class="btn btn-secondary">← Back to Dashboard</a>
     </div>
 
@@ -25,6 +30,7 @@
                 <a href="?status=Confirmed" class="btn btn-outline-primary rounded-0 {% if request.GET.status == 'Confirmed' %}active{% endif %}">Confirmed</a>
                 <a href="?status=Checked In" class="btn btn-outline-primary rounded-0 {% if request.GET.status == 'Checked In' %}active{% endif %}">Checked In</a>
                 <a href="?status=Checked Out" class="btn btn-outline-primary rounded-0 {% if request.GET.status == 'Checked Out' %}active{% endif %}">Checked Out</a>
+                <a href="?status=Cancellation Pending" class="btn btn-outline-primary rounded-0 {% if request.GET.status == 'Cancellation Pending' %}active{% endif %}">Cancellation Pending</a>
                 <a href="?status=Cancelled" class="btn btn-outline-primary rounded-0 {% if request.GET.status == 'Cancelled' %}active{% endif %}">Cancelled</a>
             </div>
         </div>
@@ -86,6 +92,11 @@
                             {% if res.status == 'Checked In' %}
                                 <a href="{% url 'update_reservation_status' res.id 'check_out' %}" 
                                    class="btn btn-warning btn-sm" title="Check Out">⊲</a>
+                            {% endif %}
+
+                            {% if res.status == 'Cancellation Pending' %}
+                                <a href="{% url 'update_reservation_status' res.id 'approve_cancellation' %}" 
+                                   class="btn btn-primary btn-sm" title="Approve Cancellation">✔</a>
                             {% endif %}
                             
                             {% if res.status == 'Pending' or res.status == 'Confirmed' %}

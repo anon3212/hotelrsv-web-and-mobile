@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Booking Confirmation</title>
+    <style>
+        body { font-family: Arial, sans-serif; color: #333; background-color: #f9f9f9; margin: 0; padding: 0; }
+        .container { max-width: 600px; margin: 0 auto; background: #ffffff; padding: 24px; border-radius: 8px; }
+        .header { border-bottom: 1px solid #e0e0e0; padding-bottom: 16px; margin-bottom: 24px; }
+        .headline { color: #1abc9c; margin: 0; }
+        .details { margin-bottom: 20px; }
+        .details p { margin: 8px 0; }
+        .label { font-weight: bold; }
+        .footer { margin-top: 28px; font-size: 14px; color: #666; }
+        .policy { background: #f2f8f4; padding: 12px 16px; border-radius: 6px; margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1 class="headline">Booking Confirmed</h1>
+            <p>Thank you for booking with BookInn.</p>
+        </div>
+
+        <div class="details">
+            <p><span class="label">Booking ID:</span> {{ reservation.booking_id }}</p>
+            <p><span class="label">Guest Name:</span> {{ reservation.guest_name }}</p>
+            <p><span class="label">Room:</span> {{ reservation.room.name }} ({{ reservation.room.room_type }})</p>
+            <p><span class="label">Check-in:</span> {{ reservation.check_in|date:"F j, Y @ g:i A" }}</p>
+            <p><span class="label">Check-out:</span> {{ reservation.check_out|date:"F j, Y @ g:i A" }}</p>
+            <p><span class="label">Payment Method:</span> {{ reservation.payment_method }}</p>
+            <p><span class="label">Reference:</span> {{ reservation.payment_reference }}</p>
+        </div>
+
+        <div class="policy">
+            <p><strong>Booking Policy</strong></p>
+            <p>{{ policy_text }}</p>
+        </div>
+
+        <div class="footer">
+            <p>If you have any questions, reply to this email or visit your BookInn profile for more details.</p>
+            <p>Safe travels!</p>
+        </div>
+    </div>
+</body>
+</html>

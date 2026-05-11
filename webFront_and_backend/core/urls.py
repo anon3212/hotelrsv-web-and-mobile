@@ -30,6 +30,7 @@ urlpatterns = [
     
     # User Profile & Booking Flow
     path('profile/', views.user_profile, name='profile'),
+    path('profile/cancel/<int:reservation_id>/', views.request_cancellation, name='request_cancellation'),
     path('confirmation/<int:reservation_id>/', views.confirmation_view, name='confirmation_view'),
     path('payment/<int:reservation_id>/', views.payment_page, name='payment_page'),
     path('upload-receipt/<int:reservation_id>/', views.upload_receipt, name='upload_receipt'),
@@ -56,6 +57,8 @@ urlpatterns += [
     path('api/reservations/', views.api_create_reservation, name='api_create_reservation'),
     path('api/user/reservations/', views.api_user_reservations, name='api_user_reservations'),
     path('api/reservations/<int:reservation_id>/', views.api_reservation_detail, name='api_reservation_detail'),
+    path('api/reservations/<int:reservation_id>/cancel-request/', views.api_request_cancellation, name='api_request_cancellation'),
+    path('api/admin/reservations/<int:reservation_id>/approve-cancellation/', views.api_approve_cancellation, name='api_approve_cancellation'),
 ]
 
 # Development Static/Media Files

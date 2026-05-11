@@ -113,6 +113,9 @@
 
     <h2>Confirm Your Stay</h2>
     <p class="subtitle">Booking for: <strong>{{ room.name }}</strong></p>
+    <p class="subtitle" style="color: #1abc9c; margin-bottom: 20px;">
+        Booking policy: check-in between <strong>2:00 PM</strong> and <strong>7:00 PM</strong>, check-out at <strong>12:00 PM</strong>.
+    </p>
 
     <form method="POST" action="{% url 'book_room' room.id %}" enctype="multipart/form-data">
         {% csrf_token %}

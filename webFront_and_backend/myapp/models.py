@@ -2,7 +2,10 @@ from django.db import models
 from django.core.exceptions import ValidationError
 from django.conf import settings
 from django.db.models import Q
-from django.core.mail import send_mail  # Added for email functionality
+from django.core.mail import send_mail
+from django.template.loader import render_to_string
+from django.utils.html import strip_tags
+from django.utils import timezone
 
 class Room(models.Model):
     ROOM_TYPES = [
@@ -47,6 +50,7 @@ class Reservation(models.Model):
     STATUS_CHOICES = [
         ('Pending', 'Pending'), 
         ('Confirmed', 'Confirmed'),
+        ('Cancellation Pending', 'Cancellation Pending'),
         ('Checked In', 'Checked In'),
         ('Checked Out', 'Checked Out'),
         ('Cancelled', 'Cancelled'),
@@ -77,8 +81,8 @@ class Reservation(models.Model):
     
     room = models.ForeignKey('Room', on_delete=models.CASCADE, related_name='reservations')
     
-    check_in = models.DateField()
-    check_out = models.DateField()
+    check_in = models.DateTimeField()
+    check_out = models.DateTimeField()
     
     payment_method = models.CharField(max_length=20, choices=PAYMENT_METHODS, default='GCash')
     payment_status = models.CharField(max_length=20, choices=PAYMENT_STATUS, default='Pending')
@@ -86,11 +90,12 @@ class Reservation(models.Model):
     
     payment_reference = models.CharField(max_length=100, null=True, blank=True)
     receipt_screenshot = models.ImageField(upload_to='receipts/', null=True, blank=True)
+    cancellation_requested_at = models.DateTimeField(null=True, blank=True)
 
     def clean(self):
         if self.check_in and self.check_out:
             if self.check_out <= self.check_in:
-                raise ValidationError("Check-out date must be after check-in date.")
+                raise ValidationError("Check-out datetime must be after check-in datetime.")
             
             exists = Reservation.objects.filter(
                 room=self.room,
@@ -102,42 +107,68 @@ class Reservation(models.Model):
             if exists:
                 raise ValidationError(f"Room {self.room.name} is already booked for these dates.")
 
-    # --- NEW LOGIC START ---
     def save(self, *args, **kwargs):
-        # 1. Check if this is an update (not a brand new booking)
-        if self.pk:
-            old_reservation = Reservation.objects.get(pk=self.pk)
-            # 2. Check if status is being changed from Pending to Confirmed
-            if old_reservation.status == 'Pending' and self.status == 'Confirmed':
-                self.send_confirmation_email()
+        is_new = self.pk is None
+        old_status = None
+        if not is_new:
+            try:
+                old_reservation = Reservation.objects.get(pk=self.pk)
+                old_status = old_reservation.status
+            except Reservation.DoesNotExist:
+                old_status = None
 
         super().save(*args, **kwargs)
 
-    def send_confirmation_email(self):
-        # Use the email linked to the user account
-        recipient = self.user.email if self.user else None
-        
-        if recipient:
-            subject = f"Booking Confirmed: {self.booking_id}"
-            message = (
-                f"Hello {self.guest_name},\n\n"
-                f"We have successfully verified your payment receipt for booking {self.booking_id}.\n"
-                f"Your reservation for {self.room.name} is now CONFIRMED.\n\n"
-                f"Check-in: {self.check_in}\n"
-                f"Check-out: {self.check_out}\n\n"
-                "We look forward to seeing you!"
+        if old_status == 'Pending' and self.status == 'Confirmed':
+            self.send_booking_summary_email()
+        if old_status == 'Cancellation Pending' and self.status == 'Cancelled':
+            self.send_cancellation_approved_email()
+
+    def send_booking_summary_email(self):
+        if not self.user or not self.user.email:
+            return
+
+        subject = 'Booking Confirmation'
+        html_message = render_to_string('emails/booking_summary.html', {
+            'reservation': self,
+            'policy_text': 'Check-in 2:00 PM / Check-out 12:00 PM',
+        })
+        plain_message = strip_tags(html_message)
+
+        try:
+            send_mail(
+                subject,
+                plain_message,
+                settings.EMAIL_HOST_USER,
+                [self.user.email],
+                html_message=html_message,
+                fail_silently=False,
             )
-            try:
-                send_mail(
-                    subject,
-                    message,
-                    settings.EMAIL_HOST_USER,
-                    [recipient],
-                    fail_silently=False,
-                )
-            except Exception as e:
-                print(f"Error sending email: {e}")
-    # --- NEW LOGIC END ---
+        except Exception as e:
+            print(f"Error sending booking confirmation email: {e}")
+
+    def send_cancellation_approved_email(self):
+        if not self.user or not self.user.email:
+            return
+
+        subject = 'Booking Cancellation Approved'
+        html_message = render_to_string('emails/cancellation_approved.html', {
+            'reservation': self,
+            'policy_text': 'If cancellation is within 20 days of the booked date, it is non-refundable.',
+        })
+        plain_message = strip_tags(html_message)
+
+        try:
+            send_mail(
+                subject,
+                plain_message,
+                settings.EMAIL_HOST_USER,
+                [self.user.email],
+                html_message=html_message,
+                fail_silently=False,
+            )
+        except Exception as e:
+            print(f"Error sending cancellation approval email: {e}")
 
     def __str__(self):
         return f"{self.booking_id} - {self.guest_name}"

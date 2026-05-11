@@ -1,0 +1,71 @@
+/* Modern Deep Teal Theme for BookInn Admin */
+:root {
+    --primary-teal: #0F1F24;
+    --darker-bg: #0b161a;
+    --accent-teal: #14B8A6;
+    --text-white: #ffffff;
+    --border-glow: rgba(20, 184, 166, 0.3);
+}
+
+/* Header Branding */
+#header { 
+    background: var(--primary-teal) !important; 
+    border-bottom: 3px solid var(--accent-teal) !important;
+    padding: 15px 40px;
+}
+
+#branding h1 { 
+    color: var(--accent-teal) !important; 
+    font-weight: bold; 
+    font-size: 24px;
+    letter-spacing: 1px;
+}
+
+/* Breadcrumbs & Module Headers */
+div.breadcrumbs { 
+    background: var(--darker-bg) !important; 
+    color: var(--text-white) !important; 
+    border-bottom: 1px solid var(--border-glow);
+}
+
+.module h2, .module caption, .inline-group h2 { 
+    background: var(--accent-teal) !important; 
+    color: #0F1F24 !important; 
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+/* Sidebar & Dashboard Cards */
+.module {
+    background: var(--primary-teal) !important;
+    border: 1px solid var(--border-glow) !important;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+/* Buttons */
+.button, input[type=submit], .submit-row input { 
+    background: var(--accent-teal) !important; 
+    border: none !important;
+    border-radius: 8px !important; 
+    color: #0F1F24 !important;
+    padding: 10px 20px !important;
+    font-weight: bold;
+    transition: 0.3s ease;
+}
+
+.button:hover, input[type=submit]:hover {
+    background: #0D9488 !important;
+    transform: translateY(-1px);
+}
+
+/* Links and Tables */
+a:link, a:visited { color: var(--accent-teal) !important; }
+a:hover { color: #0D9488 !important; }
+
+table thead th {
+    background: var(--darker-bg) !important;
+    color: var(--accent-teal) !important;
+}
+
+tr.selected { background-color: rgba(20, 184, 166, 0.1) !important; }

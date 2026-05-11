@@ -7,8 +7,10 @@ SECRET_KEY = 'django-insecure-9%v!1#v^9(ueg**@$_w59k&r$bybcz_&eeoe4he+h$qc%)_4j!
 
 DEBUG = True
 
-# Added your IP for mobile testing
-ALLOWED_HOSTS = ['*', '192.168.100.14', '127.0.0.1', 'localhost']
+ALLOWED_HOSTS = os.environ.get(
+    'DJANGO_ALLOWED_HOSTS',
+    '127.0.0.1,localhost,192.168.100.14,172.20.10.2,api.your-production-domain.com'
+).split(',')
 
 # Application definition
 INSTALLED_APPS = [
@@ -72,7 +74,11 @@ DATABASES = {
 }
 
 # Mobile API Settings
-CORS_ALLOW_ALL_ORIGINS = True 
+CORS_ALLOWED_ORIGINS = os.environ.get(
+    'CORS_ALLOWED_ORIGINS',
+    'http://localhost:19006,http://192.168.100.14:19006,http://10.0.2.2:19006,https://your-production-domain.com'
+).split(',')
+CORS_ALLOW_CREDENTIALS = True
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [

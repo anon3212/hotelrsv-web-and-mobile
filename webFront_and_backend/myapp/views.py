@@ -11,7 +11,7 @@ from django.utils import timezone
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.db.models import Q, Case, When, Value, IntegerField
-from datetime import datetime # Added for date parsing
+from datetime import datetime, time
 import uuid
 from django.core.mail import send_mail
 from django import forms
@@ -63,15 +63,17 @@ def home(request):
         booked_count = 0
         if check_in and check_out:
             try:
-                # Convert strings to date objects for accurate DB filtering
-                c_in = datetime.strptime(check_in, '%Y-%m-%d').date()
-                c_out = datetime.strptime(check_out, '%Y-%m-%d').date()
+                # Convert strings to datetimes using the fixed policy window
+                c_in = datetime.strptime(check_in, '%Y-%m-%d')
+                c_out = datetime.strptime(check_out, '%Y-%m-%d')
+                c_in_dt = datetime.combine(c_in.date(), time(14, 0))
+                c_out_dt = datetime.combine(c_out.date(), time(12, 0))
                 
                 booked_count = Reservation.objects.filter(
                     room__room_type=r_type,
                     status__in=['Confirmed', 'Checked In']
                 ).filter(
-                    Q(check_in__lt=c_out) & Q(check_out__gt=c_in)
+                    Q(check_in__lt=c_out_dt) & Q(check_out__gt=c_in_dt)
                 ).values('room').distinct().count()
             except ValueError:
                 pass # Fallback if date format is wrong
@@ -128,6 +130,11 @@ def book_room(request, room_id):
             return redirect('book_room', room_id=room_id)
 
         try:
+            check_in_date = datetime.strptime(c_in, '%Y-%m-%d')
+            check_out_date = datetime.strptime(c_out, '%Y-%m-%d')
+            check_in_at = datetime.combine(check_in_date.date(), time(14, 0))
+            check_out_at = datetime.combine(check_out_date.date(), time(12, 0))
+
             # Create the reservation
             new_reservation = Reservation.objects.create(
                 user=request.user,
@@ -135,8 +142,8 @@ def book_room(request, room_id):
                 booking_id=f"BK-{uuid.uuid4().hex[:4].upper()}",
                 guest_name=g_name,
                 contact=g_contact,
-                check_in=c_in,
-                check_out=c_out,
+                check_in=check_in_at,
+                check_out=check_out_at,
                 payment_method=p_method,
                 payment_reference=p_ref,
                 receipt_screenshot=receipt,
@@ -189,14 +196,30 @@ def user_profile(request):
             When(status='Pending', then=Value(1)),
             When(payment_status='Under Review', then=Value(2)),
             When(status='Confirmed', then=Value(3)),
-            When(status='Checked In', then=Value(4)),
-            When(status='Checked Out', then=Value(5)),
-            When(status='Cancelled', then=Value(6)),
+            When(status='Cancellation Pending', then=Value(4)),
+            When(status='Checked In', then=Value(5)),
+            When(status='Checked Out', then=Value(6)),
+            When(status='Cancelled', then=Value(7)),
             output_field=IntegerField(),
         )
     ).order_by('status_priority', '-check_in')
     
     return render(request, 'profile.html', {'bookings': bookings})
+
+@login_required
+def request_cancellation(request, reservation_id):
+    reservation = get_object_or_404(Reservation, id=reservation_id, user=request.user)
+
+    if reservation.status in ['Cancelled', 'Cancellation Pending', 'Checked Out']:
+        messages.warning(request, 'This booking cannot be cancelled at this stage.')
+        return redirect('profile')
+
+    reservation.status = 'Cancellation Pending'
+    reservation.cancellation_requested_at = timezone.now()
+    reservation.save()
+
+    messages.success(request, 'Cancellation request submitted. If it is within 20 days of the booked date, it is non-refundable.')
+    return redirect('profile')
 
 @login_required
 def confirmation_view(request, reservation_id):
@@ -229,6 +252,7 @@ def update_reservation_status(request, res_id, action):
         else:
             reservation.payment_status = 'Paid'
             reservation.status = 'Confirmed'
+            reservation.save()
             messages.success(request, f"Payment for {reservation.booking_id} approved and booking confirmed.")
     
     elif action == 'check_in':
@@ -238,6 +262,7 @@ def update_reservation_status(request, res_id, action):
             reservation.status = 'Checked In'
             reservation.room.status = 'Occupied'
             reservation.room.save()
+            reservation.save()
             messages.success(request, f"Guest {reservation.guest_name} checked in to {reservation.room.name}.")
         
     elif action == 'check_out':
@@ -247,6 +272,7 @@ def update_reservation_status(request, res_id, action):
             reservation.status = 'Checked Out'
             reservation.room.status = 'Available'
             reservation.room.save()
+            reservation.save()
             messages.success(request, f"Guest {reservation.guest_name} checked out.")
 
     elif action == 'cancel':
@@ -256,7 +282,18 @@ def update_reservation_status(request, res_id, action):
             reservation.status = 'Cancelled'
             reservation.room.status = 'Available'
             reservation.room.save()
+            reservation.save()
             messages.warning(request, f"Reservation {reservation.booking_id} cancelled.")
+
+    elif action == 'approve_cancellation':
+        if reservation.status != 'Cancellation Pending':
+            messages.warning(request, f"Reservation {reservation.booking_id} does not have a cancellation request pending.")
+        else:
+            reservation.status = 'Cancelled'
+            reservation.room.status = 'Available'
+            reservation.room.save()
+            reservation.save()
+            messages.success(request, f"Cancellation for {reservation.booking_id} approved.")
 
     reservation.save()
     return redirect('admin_dashboard')
@@ -526,13 +563,15 @@ def api_create_reservation(request):
             return JsonResponse({'error': 'All fields are required'}, status=400)
 
         try:
-            check_in_date = datetime.strptime(check_in, '%Y-%m-%d').date()
-            check_out_date = datetime.strptime(check_out, '%Y-%m-%d').date()
+            check_in_date = datetime.strptime(check_in, '%Y-%m-%d')
+            check_out_date = datetime.strptime(check_out, '%Y-%m-%d')
+            check_in_at = datetime.combine(check_in_date.date(), time(14, 0))
+            check_out_at = datetime.combine(check_out_date.date(), time(12, 0))
         except ValueError:
             return JsonResponse({'error': 'Invalid date format. Use YYYY-MM-DD.'}, status=400)
 
-        if check_out_date <= check_in_date:
-            return JsonResponse({'error': 'Check-out date must be after check-in date.'}, status=400)
+        if check_out_at <= check_in_at:
+            return JsonResponse({'error': 'Check-out must be after check-in.'}, status=400)
         
         # Get the room
         try:
@@ -547,8 +586,8 @@ def api_create_reservation(request):
             booking_id=f"BK-{uuid.uuid4().hex[:4].upper()}",
             guest_name=guest_name,
             contact=contact,
-            check_in=check_in_date,
-            check_out=check_out_date,
+            check_in=check_in_at,
+            check_out=check_out_at,
             payment_method=payment_method,
             payment_reference=payment_reference,
             receipt_screenshot=receipt_screenshot,
@@ -609,8 +648,8 @@ def api_reservation_detail(request, reservation_id):
                 'price': str(reservation.room.price),
                 'image': reservation.room.image.url if reservation.room.image else None,
             },
-            'check_in': reservation.check_in.strftime('%Y-%m-%d'),
-            'check_out': reservation.check_out.strftime('%Y-%m-%d'),
+            'check_in': reservation.check_in.isoformat(),
+            'check_out': reservation.check_out.isoformat(),
             'guest_name': reservation.guest_name,
             'contact': reservation.contact,
             'status': reservation.status,
@@ -624,3 +663,51 @@ def api_reservation_detail(request, reservation_id):
         return JsonResponse(data)
     except Reservation.DoesNotExist:
         return JsonResponse({'error': 'Reservation not found'}, status=404)
+
+@csrf_exempt
+def api_request_cancellation(request, reservation_id):
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+
+    user = get_token_user(request)
+    if user is None:
+        return JsonResponse({'error': 'Authentication required'}, status=401)
+
+    try:
+        reservation = Reservation.objects.get(id=reservation_id, user=user)
+    except Reservation.DoesNotExist:
+        return JsonResponse({'error': 'Reservation not found'}, status=404)
+
+    if reservation.status in ['Cancelled', 'Cancellation Pending', 'Checked Out']:
+        return JsonResponse({'error': 'Cancellation cannot be requested for this booking.'}, status=400)
+
+    reservation.status = 'Cancellation Pending'
+    reservation.cancellation_requested_at = timezone.now()
+    reservation.save()
+
+    return JsonResponse({
+        'message': 'Cancellation request submitted.',
+        'status': reservation.status,
+        'policy': 'If the cancellation is within 20 days of the booked date, it is non-refundable.'
+    })
+
+@csrf_exempt
+@staff_member_required
+def api_approve_cancellation(request, reservation_id):
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+
+    try:
+        reservation = Reservation.objects.get(id=reservation_id)
+    except Reservation.DoesNotExist:
+        return JsonResponse({'error': 'Reservation not found'}, status=404)
+
+    if reservation.status != 'Cancellation Pending':
+        return JsonResponse({'error': 'No pending cancellation request.'}, status=400)
+
+    reservation.status = 'Cancelled'
+    reservation.room.status = 'Available'
+    reservation.room.save()
+    reservation.save()
+
+    return JsonResponse({'message': 'Cancellation approved.', 'status': reservation.status})

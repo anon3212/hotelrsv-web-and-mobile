@@ -121,6 +121,9 @@
         </div>
 
         <h2>My Bookings</h2>
+        <p style="color: #1abc9c; margin-top: 10px; margin-bottom: 20px;">
+            Booking policy: Check-in window is <strong>2:00 PM - 7:00 PM</strong> and Check-out is at <strong>12:00 PM</strong>.
+        </p>
         
         {% if messages %}
             {% for message in messages %}
@@ -136,6 +139,7 @@
                     <th>Check-in</th>
                     <th>Check-out</th>
                     <th>Status</th>
+                    <th>Action</th>
                 </tr>
             </thead>
             <tbody>
@@ -143,13 +147,27 @@
                 <tr>
                     <td>{{ booking.booking_id }}</td>
                     <td>{{ booking.room.room_type }}</td>
-                    <td>{{ booking.check_in }}</td>
-                    <td>{{ booking.check_out }}</td>
+                    <td>{{ booking.check_in|date:"M d, Y @ h:i A" }}</td>
+                    <td>{{ booking.check_out|date:"M d, Y @ h:i A" }}</td>
                     <td><span class="status-badge">{{ booking.status }}</span></td>
+                    <td>
+                        {% if booking.status == 'Confirmed' %}
+                            <form action="{% url 'request_cancellation' booking.id %}" method="post" style="display:inline;">
+                                {% csrf_token %}
+                                <button type="submit" style="padding: 8px 12px; background: #ff6b6b; color: white; border:none; border-radius:6px; cursor:pointer;" onclick="return confirm('If the cancellation is within 20 days of the booked date, it is non-refundable. Continue?');">
+                                    Cancel
+                                </button>
+                            </form>
+                        {% elif booking.status == 'Cancellation Pending' %}
+                            <span class="status-badge" style="background: #f39c12;">Cancellation Pending</span>
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="5">No bookings found. <a href="{% url 'home' %}" style="color: var(--primary-teal);">Book now!</a></td>
+                    <td colspan="6">No bookings found. <a href="{% url 'home' %}" style="color: var(--primary-teal);">Book now!</a></td>
                 </tr>
                 {% endfor %}
             </tbody>
