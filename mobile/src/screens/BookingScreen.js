@@ -9,8 +9,10 @@ import {
   ImageBackground,
   Alert,
   ActivityIndicator,
+  Image,
 } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import * as ImagePicker from 'expo-image-picker';
 import { BASE_URL, COLORS } from '../constants/theme';
 import { reservationsAPI } from '../services/api';
 
@@ -24,7 +26,27 @@ export default function BookingScreen({ route, onConfirmation, onCancel }) {
   const [contact, setContact] = useState('');
   const [paymentMethod, setPaymentMethod] = useState('GCash');
   const [paymentRef, setPaymentRef] = useState('');
+  const [receiptImage, setReceiptImage] = useState(null);
   const [loading, setLoading] = useState(false);
+
+  const pickImage = async () => {
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== 'granted') {
+      Alert.alert('Permission needed', 'Please grant permission to access your photos');
+      return;
+    }
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      setReceiptImage(result.assets[0].uri);
+    }
+  };
 
   const handleCheckInChange = (event, selectedDate) => {
     setShowCheckInPicker(false);
@@ -37,8 +59,8 @@ export default function BookingScreen({ route, onConfirmation, onCancel }) {
   };
 
   const handleBooking = async () => {
-    if (!guestName || !contact || !paymentRef) {
-      Alert.alert('Error', 'Please fill in all fields');
+    if (!guestName || !contact || !paymentRef || !receiptImage) {
+      Alert.alert('Error', 'Please fill in all fields and upload receipt');
       return;
     }
 
@@ -60,7 +82,7 @@ export default function BookingScreen({ route, onConfirmation, onCancel }) {
         checkOutStr,
         paymentMethod,
         paymentRef,
-        null // No screenshot for now
+        receiptImage
       );
 
       if (result.id) {
@@ -142,6 +164,12 @@ export default function BookingScreen({ route, onConfirmation, onCancel }) {
             )}
 
             <Text style={styles.nights}>Total: {nights} nights</Text>
+
+            <View style={styles.policyBox}>
+              <Text style={styles.policyTitle}>Booking Policy</Text>
+              <Text style={styles.policyText}>Check-in window: 2:00 PM – 7:00 PM</Text>
+              <Text style={styles.policyText}>Check-out time: 12:00 PM</Text>
+            </View>
           </View>
 
           {/* Guest Info */}
@@ -170,18 +198,17 @@ export default function BookingScreen({ route, onConfirmation, onCancel }) {
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Payment Method</Text>
 
-            {['GCash', 'PayMongo', 'Cash on Arrival'].map((method) => (
-              <TouchableOpacity
-                key={method}
-                style={[styles.methodButton, paymentMethod === method && styles.methodButtonActive]}
-                onPress={() => setPaymentMethod(method)}
-              >
-                <View style={[styles.radio, paymentMethod === method && styles.radioActive]} />
-                <Text style={styles.methodText}>{method}</Text>
-              </TouchableOpacity>
-            ))}
-
-            {paymentMethod !== 'Cash on Arrival' && (
+            <View style={styles.paymentContainer}>
+              <Text style={styles.paymentLabel}>GCash Payment</Text>
+              
+              <Image
+                source={require('../../assets/gcash_qr.jpg')}
+                style={styles.qrCode}
+                resizeMode="contain"
+              />
+              
+              <Text style={styles.qrText}>Scan QR code to pay</Text>
+              
               <TextInput
                 style={styles.input}
                 placeholder="Payment Reference Number"
@@ -189,7 +216,21 @@ export default function BookingScreen({ route, onConfirmation, onCancel }) {
                 value={paymentRef}
                 onChangeText={setPaymentRef}
               />
-            )}
+
+              <TouchableOpacity style={styles.uploadButton} onPress={pickImage}>
+                <Text style={styles.uploadButtonText}>
+                  {receiptImage ? 'Change Receipt Image' : 'Select Receipt Image'}
+                </Text>
+              </TouchableOpacity>
+
+              {receiptImage && (
+                <Image source={{ uri: receiptImage }} style={styles.receiptPreview} />
+              )}
+
+              <Text style={styles.uploadHint}>
+                Tap above to select an image from your gallery
+              </Text>
+            </View>
           </View>
 
           {/* Price Summary */}
@@ -305,6 +346,25 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginTop: 10,
   },
+  policyBox: {
+    backgroundColor: '#112222',
+    borderRadius: 12,
+    padding: 14,
+    marginTop: 14,
+    borderWidth: 1,
+    borderColor: '#0B7A6D',
+  },
+  policyTitle: {
+    color: '#00C853',
+    fontSize: 14,
+    fontWeight: '700',
+    marginBottom: 6,
+  },
+  policyText: {
+    color: '#B8F1D3',
+    fontSize: 13,
+    lineHeight: 20,
+  },
   input: {
     backgroundColor: '#1C2730',
     color: 'white',
@@ -342,6 +402,50 @@ const styles = StyleSheet.create({
   methodText: {
     color: 'white',
     fontSize: 14,
+  },
+  paymentContainer: {
+    alignItems: 'center',
+  },
+  paymentLabel: {
+    color: '#00C853',
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginBottom: 15,
+  },
+  qrCode: {
+    width: 200,
+    height: 200,
+    marginBottom: 10,
+    borderRadius: 10,
+  },
+  qrText: {
+    color: '#888',
+    fontSize: 14,
+    marginBottom: 15,
+  },
+  uploadButton: {
+    backgroundColor: '#00C853',
+    borderRadius: 10,
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    marginBottom: 10,
+  },
+  uploadButtonText: {
+    color: '#121B22',
+    fontSize: 14,
+    fontWeight: 'bold',
+  },
+  receiptPreview: {
+    width: 100,
+    height: 100,
+    borderRadius: 10,
+    marginTop: 10,
+  },
+  uploadHint: {
+    color: '#888',
+    fontSize: 12,
+    textAlign: 'center',
+    marginTop: 5,
   },
   priceCard: {
     backgroundColor: 'rgba(0,200,83,0.1)',

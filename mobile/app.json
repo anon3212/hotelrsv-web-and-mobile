@@ -1,10 +1,10 @@
 {
   "expo": {
-    "name": "mobile",
+    "name": "BookInn",
     "slug": "mobile",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/logo.jpg",
     "userInterfaceStyle": "light",
     "splash": {
       "image": "./assets/splash-icon.png",
@@ -13,6 +13,7 @@
     },
     "ios": {
       "supportsTablet": true,
+      "bundleIdentifier": "com.jedcyrus.bookinn",
       "infoPlist": {
         "NSAppTransportSecurity": {
           "NSAllowsArbitraryLoads": true
@@ -20,6 +21,7 @@
       }
     },
     "android": {
+      "package": "com.jedcyrus.bookinn",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
@@ -29,7 +31,24 @@
       "favicon": "./assets/favicon.png"
     },
     "plugins": [
-      "@react-native-community/datetimepicker"
-    ]
+      "@react-native-community/datetimepicker",
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "usesCleartextTraffic": true
+          }
+        }
+      ]
+    ],
+    "extra": {
+      "API_URL": "http://172.20.10.2:8000",
+      "LOCAL_API_URL": "http://172.20.10.2:8000",
+      "PROD_API_URL": "https://your-production-domain.com",
+      "eas": {
+        "projectId": "6c7adc23-df03-4e00-b11e-7f21a7178955"
+      }
+    },
+    "owner": "jedcyrusjuario"
   }
 }

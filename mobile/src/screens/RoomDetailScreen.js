@@ -85,14 +85,6 @@ export default function RoomDetailScreen({ route, onBack, onBooking }) {
           <Text style={styles.perNight}> /night</Text>
         </View>
 
-        <View style={styles.amenitiesGrid}>
-          <AmenityItem icon="bed-king-outline" label="King Bed" />
-          <AmenityItem icon="wifi" label="WiFi" />
-          <AmenityItem icon="snowflake" label="A/C" />
-          <AmenityItem icon="bathtub-outline" label="En Suite" />
-          <AmenityItem icon="television" label="Smart TV" />
-        </View>
-
         {/* 3. Clickable Date Boxes */}
         <View style={styles.dateRow}>
           <TouchableOpacity style={styles.dateBoxWrapper} onPress={() => openPicker('checkIn')}>
@@ -127,13 +119,6 @@ export default function RoomDetailScreen({ route, onBack, onBooking }) {
   );
 }
 
-const AmenityItem = ({ icon, label }) => (
-  <View style={styles.amenityChip}>
-    <MaterialCommunityIcons name={icon} size={18} color="#00BFA5" />
-    <Text style={styles.amenityLabel}>{label}</Text>
-  </View>
-);
-
 const DateBox = ({ label, date }) => (
   <View style={styles.dateBoxInner}>
     <Text style={styles.dateLabel}>{label}</Text>
@@ -154,9 +139,6 @@ const styles = StyleSheet.create({
   priceRow: { flexDirection: 'row', alignItems: 'baseline', marginVertical: 20 },
   price: { color: '#00BFA5', fontSize: 26, fontWeight: 'bold' },
   perNight: { color: '#666', fontSize: 16 },
-  amenitiesGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 10, marginBottom: 30 },
-  amenityChip: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#1A2129', paddingHorizontal: 12, paddingVertical: 10, borderRadius: 12, width: '31%', gap: 5 },
-  amenityLabel: { color: '#ccc', fontSize: 11 },
   dateRow: { 
     flexDirection: 'row', 
     justifyContent: 'space-between', 

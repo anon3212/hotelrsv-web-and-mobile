@@ -100,14 +100,14 @@ export default function ConfirmationScreen({ route, onComplete }) {
             <View style={styles.detailRow}>
               <Text style={styles.detailLabel}>Check-in</Text>
               <Text style={styles.detailValue}>
-                {new Date(reservation.check_in).toLocaleDateString()}
+                {new Date(reservation.check_in).toLocaleDateString()} • 2:00 PM
               </Text>
             </View>
 
             <View style={styles.detailRow}>
               <Text style={styles.detailLabel}>Check-out</Text>
               <Text style={styles.detailValue}>
-                {new Date(reservation.check_out).toLocaleDateString()}
+                {new Date(reservation.check_out).toLocaleDateString()} • 12:00 PM
               </Text>
             </View>
 
@@ -127,6 +127,12 @@ export default function ConfirmationScreen({ route, onComplete }) {
                 <Text style={styles.detailValue}>{reservation.payment_reference}</Text>
               </View>
             )}
+
+            <View style={styles.policyNotice}>
+              <Text style={styles.policyNoticeTitle}>Booking Time Policy</Text>
+              <Text style={styles.policyNoticeText}>Check-in window: 2:00 PM - 7:00 PM</Text>
+              <Text style={styles.policyNoticeText}>Check-out time: 12:00 PM</Text>
+            </View>
           </View>
 
           {/* Action Buttons */}
@@ -240,6 +246,24 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     borderBottomWidth: 1,
     borderBottomColor: '#333',
+  },
+  policyNotice: {
+    marginTop: 16,
+    padding: 14,
+    borderRadius: 12,
+    backgroundColor: '#122524',
+    borderWidth: 1,
+    borderColor: '#0B7A6D',
+  },
+  policyNoticeTitle: {
+    color: '#00C853',
+    fontWeight: '700',
+    marginBottom: 6,
+  },
+  policyNoticeText: {
+    color: '#DDD',
+    fontSize: 13,
+    lineHeight: 20,
   },
   detailLabel: {
     color: '#888',

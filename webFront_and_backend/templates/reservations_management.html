@@ -48,6 +48,8 @@
                     <th>Check-In</th>
                     <th>Check-Out</th>
                     <th>Payment</th>
+                    <th>Reference</th>
+                    <th>Receipt</th>
                     <th>Status</th>
                     <th>Actions</th>
                 </tr>
@@ -66,6 +68,20 @@
                         <small class="{% if res.payment_status == 'Under Review' %}text-warning fw-bold{% else %}text-muted{% endif %}">
                             {{ res.payment_status }}
                         </small>
+                    </td>
+                    <td>
+                        {% if res.payment_reference %}
+                            <code>{{ res.payment_reference }}</code>
+                        {% else %}
+                            <small class="text-muted">-</small>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if res.receipt_screenshot %}
+                            <a href="{{ res.receipt_screenshot.url }}" target="_blank" class="btn btn-sm btn-outline-primary">View Receipt</a>
+                        {% else %}
+                            <small class="text-muted">No receipt</small>
+                        {% endif %}
                     </td>
                     <td>
                         <span class="badge 
@@ -109,7 +125,7 @@
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="9" class="text-center text-muted py-4">No reservations found.</td>
+                    <td colspan="11" class="text-center text-muted py-4">No reservations found.</td>
                 </tr>
                 {% endfor %}
             </tbody>

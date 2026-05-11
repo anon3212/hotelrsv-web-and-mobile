@@ -15,6 +15,7 @@ const CATEGORIES = ['All', 'Standard', 'Deluxe', 'Suite'];
 export default function ExploreScreen({ onLogout, onRoomPress, onProfilePress }) {
   const [rooms, setRooms] = useState([]);
   const [activeCategory, setActiveCategory] = useState('All');
+  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     fetchRooms();
@@ -29,10 +30,14 @@ export default function ExploreScreen({ onLogout, onRoomPress, onProfilePress })
     }
   };
 
-  // Filter rooms based on the selected category
-  const filteredRooms = activeCategory === 'All' 
-    ? rooms 
-    : rooms.filter(room => room.room_type === activeCategory);
+  // Filter rooms based on the selected category and search query
+  const filteredRooms = rooms.filter(room => {
+    const matchesCategory = activeCategory === 'All' || room.room_type === activeCategory;
+    const matchesSearch = searchQuery === '' || 
+      room.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      room.description.toLowerCase().includes(searchQuery.toLowerCase());
+    return matchesCategory && matchesSearch;
+  });
 
   const renderHeader = () => (
     <View>
@@ -57,6 +62,8 @@ export default function ExploreScreen({ onLogout, onRoomPress, onProfilePress })
           placeholder="Search rooms, amenities..." 
           placeholderTextColor="#666"
           style={styles.searchInput}
+          value={searchQuery}
+          onChangeText={setSearchQuery}
         />
       </View>
 
@@ -111,6 +118,7 @@ export default function ExploreScreen({ onLogout, onRoomPress, onProfilePress })
               </ImageBackground>
               <View style={styles.cardFooter}>
                 <Text style={styles.roomName} numberOfLines={1}>{item.name || 'Standard'}</Text>
+                <Text style={styles.roomDescription} numberOfLines={2}>{item.description || 'No description available'}</Text>
                 <Text style={styles.availableCount}>{item.available_count ?? 0} available</Text>
                 <View style={styles.priceContainer}>
                   <Text style={styles.priceText}>₱{item.price || '999'}</Text>
@@ -154,6 +162,7 @@ const styles = StyleSheet.create({
   availableText: { color: '#fff', fontSize: 9, fontWeight: 'bold' },
   cardFooter: { padding: 8 },
   roomName: { color: '#fff', fontSize: 15, fontWeight: 'bold' },
+  roomDescription: { color: '#ccc', fontSize: 12, marginTop: 4, lineHeight: 16 },
   availableCount: { color: '#A3F7BF', fontSize: 11, marginTop: 4 },
   priceContainer: { flexDirection: 'row', alignItems: 'baseline', marginTop: 4 },
   priceText: { color: '#00BFA5', fontSize: 16, fontWeight: 'bold' },

@@ -106,6 +106,9 @@ export const reservationsAPI = {
 
   getReservationDetail: (reservationId) =>
     apiCall(`/api/reservations/${reservationId}/`, 'GET'),
+
+  requestCancelReservation: (reservationId) =>
+    apiCall(`/api/reservations/${reservationId}/cancel-request/`, 'POST', null, true),
 };
 
 // User API calls
