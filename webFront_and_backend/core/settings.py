@@ -1,5 +1,6 @@
 from pathlib import Path
 import os
+import dj_database_url 
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -63,14 +64,11 @@ WSGI_APPLICATION = 'core.wsgi.application'
 
 # Re-added your MySQL Database Configuration
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'hotel_db',
-        'USER': 'root',
-        'PASSWORD': 'password',
-        'HOST': '127.0.0.1',
-        'PORT': '3306',
-    }
+    'default': dj_database_url.config(
+        # Replace this value with your local database's connection string.
+        default='postgresql://root:tyyW32mAvlHSYIuUqyZrlMKdKEOhXuNf@dpg-d811hobrjlhs73ap56s0-a/hotel_db_6wki',
+        conn_max_age=600
+    )
 }
 
 # Mobile API Settings
