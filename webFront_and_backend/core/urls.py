@@ -1,5 +1,5 @@
 from django.contrib import admin
-from django.urls import path
+from django.urls import include, path
 from myapp import views  
 from django.conf import settings
 from django.conf.urls.static import static
@@ -50,6 +50,7 @@ urlpatterns = [
 
 # API Endpoints for Mobile/React Native
 urlpatterns += [
+    path('', include('myapp.urls')),  # Include API URLs from myapp/api_urls.py
     path('api/rooms/', views.api_room_list, name='api_room_list'),
     path('api/rooms/<int:room_id>/', views.api_room_detail, name='api_room_detail'),
     path('api/auth/register/', views.api_register, name='api_register'),

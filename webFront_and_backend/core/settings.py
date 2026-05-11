@@ -76,7 +76,7 @@ DATABASES = {
 # Mobile API Settings
 CORS_ALLOWED_ORIGINS = os.environ.get(
     'CORS_ALLOWED_ORIGINS',
-    'http://localhost:19006,http://192.168.100.14:19006,http://10.0.2.2:19006,https://your-production-domain.com'
+    'http://172.20.10.2:8081,http://192.168.100.14:19006,http://10.0.2.2:19006,https://your-production-domain.com'
 ).split(',')
 CORS_ALLOW_CREDENTIALS = True
 
