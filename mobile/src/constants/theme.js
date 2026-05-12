@@ -11,7 +11,8 @@ export const COLORS = {
 
 const expoExtra =
   Constants.expoConfig?.extra || Constants.manifest?.extra || {};
-const DEFAULT_BASE_URL = "http://172.20.10.2:8000/";
+const DEFAULT_BASE_URL =
+  "http://https://hotelrsv-web-and-mobile-tl3x.onrender.com/";
 
 export const BASE_URL = expoExtra.API_URL ?? DEFAULT_BASE_URL;
 export const APP_ENV = expoExtra.APP_ENV ?? "development";
