@@ -13,6 +13,10 @@ ALLOWED_HOSTS = ['*']
 # Mobile API Settings
 CORS_ALLOW_ALL_ORIGINS = True
 
+CORS_ALLOWED_ORIGINS = [
+    "https://hotelrsv-web-and-mobile-tl3x.onrender.com",
+]
+
 CORS_ALLOW_CREDENTIALS = True
 
 # Application definition
@@ -33,7 +37,7 @@ INSTALLED_APPS = [
 ]
 
 CSRF_TRUSTED_ORIGINS = [
-    "https://hotelrsv-web-and-mobile-tl3x.onrender.com"
+    "https://hotelrsv-web-and-mobile-tl3x.onrender.com",
 ]
 
 MIDDLEWARE = [
