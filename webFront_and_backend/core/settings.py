@@ -32,6 +32,10 @@ INSTALLED_APPS = [
     'myapp',
 ]
 
+CSRF_TRUSTED_ORIGINS = [
+    "https://hotelrsv-web-and-mobile-tl3x.onrender.com"
+]
+
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware', # MUST be at the top
     'django.middleware.security.SecurityMiddleware',

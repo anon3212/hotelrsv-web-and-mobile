@@ -43,8 +43,8 @@ export default {
     ],
     extra: {
       // Your Hotspot IP for the standalone APK connection
-      API_URL: "http://https://hotelrsv-web-and-mobile-tl3x.onrender.com",
-      LOCAL_API_URL: "http://https://hotelrsv-web-and-mobile-tl3x.onrender.com",
+      API_URL: "https://hotelrsv-web-and-mobile-tl3x.onrender.com",
+      LOCAL_API_URL: "https://hotelrsv-web-and-mobile-tl3x.onrender.com",
       // The EAS Project ID that was failing to link earlier
       eas: {
         projectId: "6c7adc23-df03-4e00-b11e-7f21a7178955",
