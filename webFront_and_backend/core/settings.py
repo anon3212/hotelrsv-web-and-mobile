@@ -76,8 +76,9 @@ WSGI_APPLICATION = 'core.wsgi.application'
 
 DATABASES = {
     "default": dj_database_url.config(
-        default="postgres://avnadmin:AVNS_fA92ym-TYVH3CQrjxHD@pg-30678b7c-jozuacydjuariojcsj-998c.h.aivencloud.com:13080/defaultdb?sslmode=require",
+        default=os.getenv("DATABASE_URL"),
         conn_max_age=600,
+        ssl_require=True,
     )
 }
 
@@ -116,11 +117,13 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend' # Default Django SMTP
-EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+
+EMAIL_HOST = "smtp.gmail.com"
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'juariojedcyrus@gmail.com'
-EMAIL_HOST_PASSWORD = 'xbzv zwve ijlm bqon'
 
-DEFAULT_FROM_EMAIL = 'juariojedcyrus@gmail.com'
+EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
+
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
