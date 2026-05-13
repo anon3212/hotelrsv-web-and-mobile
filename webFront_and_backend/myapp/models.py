@@ -120,6 +120,7 @@ class Reservation(models.Model):
         recipient = self.user.email if self.user else None
         
         if recipient:
+            print("I am HERE")
             subject = f"Booking Confirmed: {self.booking_id}"
             message = (
                 f"Hello {self.guest_name},\n\n"
@@ -139,6 +140,8 @@ class Reservation(models.Model):
                 )
             except Exception as e:
                 print(f"Error sending email: {e}")
+        else:
+            print("WTFFFFFF")
     # --- NEW LOGIC END ---
 
     def __str__(self):
