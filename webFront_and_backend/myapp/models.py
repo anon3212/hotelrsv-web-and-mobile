@@ -134,7 +134,7 @@ class Reservation(models.Model):
                 send_mail(
                     subject,
                     message,
-                    settings.EMAIL_HOST_USER,
+                    settings.DEFAULT_FROM_EMAIL,
                     [recipient],
                     fail_silently=False,
                 )
