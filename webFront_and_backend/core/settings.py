@@ -1,6 +1,6 @@
 from pathlib import Path
 import os
-import dj_database_url 
+import dj_database_url
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -27,12 +27,12 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    
+
     # API & Mobile Support
     'rest_framework',
     'rest_framework.authtoken',
-    'corsheaders', 
-    
+    'corsheaders',
+
     'myapp',
     'anymail',
 ]
@@ -75,15 +75,25 @@ WSGI_APPLICATION = 'core.wsgi.application'
 
 # Re-added your MySQL Database Configuration
 
+# DATABASES = {
+#     "default": dj_database_url.config(
+#         default=os.getenv("DATABASE_URL"),
+#         conn_max_age=600,
+#         ssl_require=True,
+#     )
+# }
+
+
 DATABASES = {
-    "default": dj_database_url.config(
-        default=os.getenv("DATABASE_URL"),
-        conn_max_age=600,
-        ssl_require=True,
-    )
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'hotel_db',
+        'USER': 'root',
+        'PASSWORD': 'password',
+        'HOST': '127.0.0.1',
+        'PORT': '3306',
+    }
 }
-
-
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
@@ -118,10 +128,22 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-EMAIL_BACKEND = "anymail.backends.resend.EmailBackend"
+# EMAIL_BACKEND = "anymail.backends.resend.EmailBackend"
 
-ANYMAIL = {
-    "RESEND_API_KEY": os.environ["RESEND_API_KEY"],
-}
+# ANYMAIL = {
+#     "RESEND_API_KEY": os.environ["RESEND_API_KEY"],
+# }
 
-DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL")
+# DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL")
+
+
+
+
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+
+EMAIL_HOST = "smtp.gmail.com"
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'juariojedcyrus@gmail.com'
+EMAIL_HOST_PASSWORD = 'xbzv zwve ijlm bqon'
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
